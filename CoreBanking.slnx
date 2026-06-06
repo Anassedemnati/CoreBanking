@@ -1,4 +1,10 @@
 <Solution>
+  <Folder Name="/gateway/">
+    <Project Path="gateway/CoreBanking.Gateway/CoreBanking.Gateway.csproj" />
+  </Folder>
+  <Folder Name="/gateway/tests/">
+    <Project Path="gateway/tests/CoreBanking.Gateway.IntegrationTests/CoreBanking.Gateway.IntegrationTests.csproj" />
+  </Folder>
   <Folder Name="/services/" />
   <Folder Name="/services/clients/">
     <Project Path="services/clients/CoreBanking.Clients.Api/CoreBanking.Clients.Api.csproj" />
