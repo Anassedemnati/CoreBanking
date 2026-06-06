@@ -20,7 +20,9 @@ public sealed class SavingsAccountReadRepository(SavingsAccountsReadDbContext db
                 a.NominalAnnualRate,
                 a.SubmittedOn,
                 a.ApprovedOn,
-                a.ActivatedOn))
+                a.ActivatedOn,
+                a.RejectedOn,
+                a.WithdrawnOn))
             .FirstOrDefaultAsync(ct);
     }
 }

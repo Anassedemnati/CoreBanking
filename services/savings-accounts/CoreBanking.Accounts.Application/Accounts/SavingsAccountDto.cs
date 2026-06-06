@@ -10,4 +10,6 @@ public sealed record SavingsAccountDto(
     decimal NominalAnnualRate,
     DateOnly SubmittedOn,
     DateOnly? ApprovedOn,
-    DateOnly? ActivatedOn);
+    DateOnly? ActivatedOn,
+    DateOnly? RejectedOn,
+    DateOnly? WithdrawnOn);
