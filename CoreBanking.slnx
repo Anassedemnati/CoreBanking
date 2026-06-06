@@ -10,6 +10,16 @@
     <Project Path="services/clients/tests/CoreBanking.Clients.IntegrationTests/CoreBanking.Clients.IntegrationTests.csproj" />
     <Project Path="services/clients/tests/CoreBanking.Clients.UnitTests/CoreBanking.Clients.UnitTests.csproj" />
   </Folder>
+  <Folder Name="/services/savings-accounts/">
+    <Project Path="services/savings-accounts/CoreBanking.Accounts.Api/CoreBanking.Accounts.Api.csproj" />
+    <Project Path="services/savings-accounts/CoreBanking.Accounts.Application/CoreBanking.Accounts.Application.csproj" />
+    <Project Path="services/savings-accounts/CoreBanking.Accounts.Domain/CoreBanking.Accounts.Domain.csproj" />
+    <Project Path="services/savings-accounts/CoreBanking.Accounts.Infrastructure/CoreBanking.Accounts.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/services/savings-accounts/tests/">
+    <Project Path="services/savings-accounts/tests/CoreBanking.Accounts.IntegrationTests/CoreBanking.Accounts.IntegrationTests.csproj" />
+    <Project Path="services/savings-accounts/tests/CoreBanking.Accounts.UnitTests/CoreBanking.Accounts.UnitTests.csproj" />
+  </Folder>
   <Folder Name="/services/savings-products/">
     <Project Path="services/savings-products/CoreBanking.Products.Api/CoreBanking.Products.Api.csproj" />
     <Project Path="services/savings-products/CoreBanking.Products.Application/CoreBanking.Products.Application.csproj" />
