@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/shared/">
+    <Project Path="shared/CoreBanking.BuildingBlocks.Application/CoreBanking.BuildingBlocks.Application.csproj" />
+    <Project Path="shared/CoreBanking.BuildingBlocks.Domain/CoreBanking.BuildingBlocks.Domain.csproj" />
+    <Project Path="shared/CoreBanking.BuildingBlocks.Infrastructure/CoreBanking.BuildingBlocks.Infrastructure.csproj" />
+    <Project Path="shared/CoreBanking.BuildingBlocks.Messaging/CoreBanking.BuildingBlocks.Messaging.csproj" />
+  </Folder>
+  <Folder Name="/shared/tests/">
+    <Project Path="shared/tests/CoreBanking.BuildingBlocks.UnitTests/CoreBanking.BuildingBlocks.UnitTests.csproj" />
+  </Folder>
+</Solution>
