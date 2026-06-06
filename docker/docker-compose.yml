@@ -84,6 +84,8 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+      oracle-free:
+        condition: service_healthy
     environment:
       ConnectionStrings__Primary: "User Id=CLIENTS;Password=${ORACLE_PWD};Data Source=oracle-free:1521/FREEPDB1"
       ConnectionStrings__Replica: "User Id=CLIENTS;Password=${ORACLE_PWD};Data Source=oracle-free:1521/FREEPDB1"
@@ -97,6 +99,8 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+      oracle-free:
+        condition: service_healthy
     environment:
       ConnectionStrings__Primary: "User Id=PRODUCTS;Password=${ORACLE_PWD};Data Source=oracle-free:1521/FREEPDB1"
       ConnectionStrings__Replica: "User Id=PRODUCTS;Password=${ORACLE_PWD};Data Source=oracle-free:1521/FREEPDB1"
@@ -109,6 +113,8 @@ services:
     ports: ["5103:8080"]
     depends_on:
       kafka:
+        condition: service_healthy
+      oracle-free:
         condition: service_healthy
     environment:
       ConnectionStrings__Primary: "User Id=SAVINGS;Password=${ORACLE_PWD};Data Source=oracle-free:1521/FREEPDB1"
