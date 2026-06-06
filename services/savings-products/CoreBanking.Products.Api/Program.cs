@@ -22,7 +22,20 @@ builder.Services.AddProductsInfrastructure(builder.Configuration);
 builder.Services.AddExceptionHandler<ExceptionToProblemDetailsHandler>();
 builder.Services.AddProblemDetails();
 
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer((doc, _, _) =>
+    {
+        doc.Info = new()
+        {
+            Title = "CoreBanking – Savings Products API",
+            Version = "v1",
+            Description = "Manages savings product templates. A savings product defines the interest " +
+                          "settings and currency that savings accounts are based on."
+        };
+        return Task.CompletedTask;
+    });
+});
 
 var app = builder.Build();
 
@@ -32,4 +45,4 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 
 app.MapControllers();
-app.Run();
+await app.RunAsync();

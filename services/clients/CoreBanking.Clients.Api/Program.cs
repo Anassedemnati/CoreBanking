@@ -22,7 +22,20 @@ builder.Services.AddClientsInfrastructure(builder.Configuration);
 builder.Services.AddExceptionHandler<ExceptionToProblemDetailsHandler>();
 builder.Services.AddProblemDetails();
 
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer((doc, _, _) =>
+    {
+        doc.Info = new()
+        {
+            Title = "CoreBanking – Clients API",
+            Version = "v1",
+            Description = "Manages client registration and lifecycle. Clients are people or businesses " +
+                          "that have applied (or may apply) for savings accounts."
+        };
+        return Task.CompletedTask;
+    });
+});
 
 var app = builder.Build();
 
@@ -32,4 +45,4 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 
 app.MapControllers();
-app.Run();
+await app.RunAsync();
