@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Mediator;
 using Microsoft.Extensions.Logging;
 
@@ -9,9 +10,21 @@ public sealed class LoggingBehavior<TMessage, TResponse>(ILogger<LoggingBehavior
     public async ValueTask<TResponse> Handle(TMessage message,
         MessageHandlerDelegate<TMessage, TResponse> next, CancellationToken ct)
     {
-        logger.LogInformation("Handling {Message}", typeof(TMessage).Name);
-        var response = await next(message, ct);
-        logger.LogInformation("Handled {Message}", typeof(TMessage).Name);
-        return response;
+        var name = typeof(TMessage).Name;
+        logger.LogInformation("Handling {Message}", name);
+        var sw = Stopwatch.StartNew();
+        try
+        {
+            var response = await next(message, ct);
+            sw.Stop();
+            logger.LogInformation("Handled {Message} in {ElapsedMs}ms", name, sw.ElapsedMilliseconds);
+            return response;
+        }
+        catch (Exception ex)
+        {
+            sw.Stop();
+            logger.LogError(ex, "Error handling {Message} after {ElapsedMs}ms", name, sw.ElapsedMilliseconds);
+            throw;
+        }
     }
 }

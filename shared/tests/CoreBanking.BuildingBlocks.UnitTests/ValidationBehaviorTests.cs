@@ -15,6 +15,15 @@ public sealed class ValidationBehaviorTests
         public CmdValidator() => RuleFor(x => x.Name).NotEmpty();
     }
 
+    private sealed class CmdNameAndLengthValidator : AbstractValidator<Cmd>
+    {
+        public CmdNameAndLengthValidator()
+        {
+            RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required.");
+            RuleFor(x => x.Name).MinimumLength(5).WithMessage("Name must be at least 5 chars.");
+        }
+    }
+
     [Fact]
     public async Task Throws_ValidationException_when_invalid()
     {
@@ -40,5 +49,20 @@ public sealed class ValidationBehaviorTests
         MessageHandlerDelegate<Cmd, string> next = (_, _) => new ValueTask<string>("ok");
         var result = await behavior.Handle(new Cmd(""), next, default);
         result.Should().Be("ok");
+    }
+
+    [Fact]
+    public async Task Collects_all_errors_from_all_validators()
+    {
+        var behavior = new ValidationBehavior<Cmd, string>(new IValidator<Cmd>[]
+        {
+            new CmdValidator(),               // NotEmpty
+            new CmdNameAndLengthValidator()   // NotEmpty + MinimumLength(5)
+        });
+        MessageHandlerDelegate<Cmd, string> next = (_, _) => new ValueTask<string>("ok");
+        var act = async () => await behavior.Handle(new Cmd(""), next, default);
+        var ex = await act.Should().ThrowAsync<AppValidationException>();
+        ex.Which.Errors.Should().ContainKey("Name");
+        ex.Which.Errors["Name"].Length.Should().BeGreaterThanOrEqualTo(2);
     }
 }

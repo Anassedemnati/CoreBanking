@@ -10,10 +10,11 @@ public sealed class ValidationBehavior<TMessage, TResponse>(IEnumerable<IValidat
     public async ValueTask<TResponse> Handle(TMessage message,
         MessageHandlerDelegate<TMessage, TResponse> next, CancellationToken ct)
     {
-        if (validators.Any())
+        var validatorList = validators.ToList();
+        if (validatorList.Count > 0)
         {
             var ctx = new ValidationContext<TMessage>(message);
-            var failures = validators
+            var failures = validatorList
                 .Select(v => v.Validate(ctx))
                 .SelectMany(r => r.Errors)
                 .Where(f => f is not null)
