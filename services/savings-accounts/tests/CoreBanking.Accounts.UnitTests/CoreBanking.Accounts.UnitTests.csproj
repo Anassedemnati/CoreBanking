@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\CoreBanking.Accounts.Domain\CoreBanking.Accounts.Domain.csproj" />
     <ProjectReference Include="..\..\CoreBanking.Accounts.Application\CoreBanking.Accounts.Application.csproj" />
+    <ProjectReference Include="..\..\CoreBanking.Accounts.Infrastructure\CoreBanking.Accounts.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

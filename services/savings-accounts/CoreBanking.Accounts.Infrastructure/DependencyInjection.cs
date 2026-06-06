@@ -1,12 +1,15 @@
 using CoreBanking.Accounts.Application.Abstractions;
 using CoreBanking.Accounts.Domain.Events;
+using CoreBanking.Accounts.Infrastructure.Consumers;
 using CoreBanking.Accounts.Infrastructure.Events;
+using CoreBanking.Accounts.Infrastructure.Inbox;
 using CoreBanking.Accounts.Infrastructure.Persistence;
 using CoreBanking.Accounts.Infrastructure.Services;
 using CoreBanking.BuildingBlocks.Application;
 using CoreBanking.BuildingBlocks.Domain;
 using CoreBanking.BuildingBlocks.Infrastructure;
 using CoreBanking.BuildingBlocks.Messaging;
+using CoreBanking.BuildingBlocks.Messaging.Kafka;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,6 +44,13 @@ public static class DependencyInjection
         services.AddScoped<ISavingsAccountUnitOfWork, SavingsAccountUnitOfWork>();
         services.AddScoped<IClientRefRepository, ClientRefRepository>();
         services.AddScoped<IProductRefRepository, ProductRefRepository>();
+        services.AddScoped<IInboxService, InboxService>();
+
+        services.AddOptions<KafkaOptions>()
+            .Bind(configuration.GetSection("Kafka"));
+
+        services.AddHostedService<ClientsConsumer>();
+        services.AddHostedService<ProductsConsumer>();
 
         return services;
     }
