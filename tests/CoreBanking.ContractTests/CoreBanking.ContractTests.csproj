@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\services\clients\CoreBanking.Clients.Contracts\CoreBanking.Clients.Contracts.csproj" />
+    <ProjectReference Include="..\..\services\savings-products\CoreBanking.Products.Contracts\CoreBanking.Products.Contracts.csproj" />
+    <ProjectReference Include="..\..\shared\CoreBanking.BuildingBlocks.Messaging\CoreBanking.BuildingBlocks.Messaging.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -14,6 +14,7 @@
     <Project Path="services/clients/CoreBanking.Clients.Infrastructure/CoreBanking.Clients.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/services/clients/tests/">
+    <Project Path="services/clients/tests/CoreBanking.Clients.ArchTests/CoreBanking.Clients.ArchTests.csproj" />
     <Project Path="services/clients/tests/CoreBanking.Clients.IntegrationTests/CoreBanking.Clients.IntegrationTests.csproj" />
     <Project Path="services/clients/tests/CoreBanking.Clients.UnitTests/CoreBanking.Clients.UnitTests.csproj" />
   </Folder>
@@ -24,6 +25,7 @@
     <Project Path="services/savings-accounts/CoreBanking.Accounts.Infrastructure/CoreBanking.Accounts.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/services/savings-accounts/tests/">
+    <Project Path="services/savings-accounts/tests/CoreBanking.Accounts.ArchTests/CoreBanking.Accounts.ArchTests.csproj" />
     <Project Path="services/savings-accounts/tests/CoreBanking.Accounts.IntegrationTests/CoreBanking.Accounts.IntegrationTests.csproj" />
     <Project Path="services/savings-accounts/tests/CoreBanking.Accounts.UnitTests/CoreBanking.Accounts.UnitTests.csproj" />
   </Folder>
@@ -35,6 +37,7 @@
     <Project Path="services/savings-products/CoreBanking.Products.Infrastructure/CoreBanking.Products.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/services/savings-products/tests/">
+    <Project Path="services/savings-products/tests/CoreBanking.Products.ArchTests/CoreBanking.Products.ArchTests.csproj" />
     <Project Path="services/savings-products/tests/CoreBanking.Products.IntegrationTests/CoreBanking.Products.IntegrationTests.csproj" />
     <Project Path="services/savings-products/tests/CoreBanking.Products.UnitTests/CoreBanking.Products.UnitTests.csproj" />
   </Folder>
@@ -47,5 +50,8 @@
   <Folder Name="/shared/tests/">
     <Project Path="shared/tests/CoreBanking.BuildingBlocks.IntegrationTests/CoreBanking.BuildingBlocks.IntegrationTests.csproj" />
     <Project Path="shared/tests/CoreBanking.BuildingBlocks.UnitTests/CoreBanking.BuildingBlocks.UnitTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CoreBanking.ContractTests/CoreBanking.ContractTests.csproj" />
   </Folder>
 </Solution>
