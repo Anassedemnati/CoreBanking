@@ -1,6 +1,6 @@
 using CoreBanking.BuildingBlocks.Messaging;
 
-namespace CoreBanking.Products.Infrastructure;
+namespace CoreBanking.Products.Contracts;
 
 public sealed record SavingsProductCreatedIntegrationEvent(
     Guid EventId,

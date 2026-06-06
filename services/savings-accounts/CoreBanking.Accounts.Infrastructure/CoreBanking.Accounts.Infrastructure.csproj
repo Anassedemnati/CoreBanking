@@ -8,8 +8,8 @@
     <ProjectReference Include="..\CoreBanking.Accounts.Application\CoreBanking.Accounts.Application.csproj" />
     <ProjectReference Include="..\..\..\shared\CoreBanking.BuildingBlocks.Infrastructure\CoreBanking.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\shared\CoreBanking.BuildingBlocks.Messaging\CoreBanking.BuildingBlocks.Messaging.csproj" />
-    <ProjectReference Include="..\..\clients\CoreBanking.Clients.Infrastructure\CoreBanking.Clients.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\savings-products\CoreBanking.Products.Infrastructure\CoreBanking.Products.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\clients\CoreBanking.Clients.Contracts\CoreBanking.Clients.Contracts.csproj" />
+    <ProjectReference Include="..\..\savings-products\CoreBanking.Products.Contracts\CoreBanking.Products.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Confluent.Kafka" />

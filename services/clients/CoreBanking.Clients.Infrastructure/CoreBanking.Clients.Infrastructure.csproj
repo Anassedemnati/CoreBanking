@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\CoreBanking.Clients.Application\CoreBanking.Clients.Application.csproj" />
+    <ProjectReference Include="..\CoreBanking.Clients.Contracts\CoreBanking.Clients.Contracts.csproj" />
     <ProjectReference Include="..\..\..\shared\CoreBanking.BuildingBlocks.Infrastructure\CoreBanking.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\shared\CoreBanking.BuildingBlocks.Messaging\CoreBanking.BuildingBlocks.Messaging.csproj" />
   </ItemGroup>

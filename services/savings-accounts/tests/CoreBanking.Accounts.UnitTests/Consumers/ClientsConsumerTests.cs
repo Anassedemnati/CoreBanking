@@ -3,7 +3,7 @@ using CoreBanking.Accounts.Application.Abstractions;
 using CoreBanking.Accounts.Application.ReadModels;
 using CoreBanking.Accounts.Infrastructure.Consumers;
 using CoreBanking.BuildingBlocks.Infrastructure;
-using CoreBanking.Clients.Infrastructure;
+using CoreBanking.Clients.Contracts;
 using FluentAssertions;
 using NSubstitute;
 using Xunit;
@@ -126,10 +126,10 @@ public sealed class ClientsConsumerTests
     }
 
     // -------------------------------------------------------------------------
-    // ClientActivated when ClientRef does not exist yet → skipped gracefully
+    // ClientActivated when ClientRef does not exist yet → marks inbox and returns without upserting
     // -------------------------------------------------------------------------
     [Fact]
-    public async Task ClientActivated_when_ref_not_found_is_skipped()
+    public async Task ClientActivated_when_ref_not_found_marks_inbox_and_returns_without_upserting()
     {
         var clientId = Guid.NewGuid();
         var eventId = Guid.NewGuid();
@@ -149,6 +149,35 @@ public sealed class ClientsConsumerTests
             CancellationToken.None);
 
         await clientRefRepo.DidNotReceive().UpsertAsync(Arg.Any<ClientRef>(), Arg.Any<CancellationToken>());
+        await inbox.Received(1).MarkProcessedAsync(eventId, nameof(ClientActivatedIntegrationEvent), Arg.Any<CancellationToken>());
+        await uow.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    // -------------------------------------------------------------------------
+    // Duplicate ClientActivated when ref not found → idempotency guard fires first, no mark or save
+    // -------------------------------------------------------------------------
+    [Fact]
+    public async Task ClientActivated_when_ref_not_found_and_duplicate_is_skipped_entirely()
+    {
+        var clientId = Guid.NewGuid();
+        var eventId = Guid.NewGuid();
+        var @event = new ClientActivatedIntegrationEvent(
+            eventId, DateTimeOffset.UtcNow, 2, clientId, DateOnly.FromDateTime(DateTime.Today));
+
+        var clientRefRepo = Substitute.For<IClientRefRepository>();
+        clientRefRepo.FindAsync(clientId, Arg.Any<CancellationToken>()).Returns((ClientRef?)null);
+        var uow = Substitute.For<ISavingsAccountUnitOfWork>();
+        var inbox = Substitute.For<IInboxService>();
+        inbox.HasProcessedAsync(eventId, Arg.Any<CancellationToken>()).Returns(true); // already processed
+
+        await ClientsConsumer.HandleEventAsync(
+            nameof(ClientActivatedIntegrationEvent),
+            Serialize(@event),
+            clientRefRepo, uow, inbox,
+            CancellationToken.None);
+
+        await clientRefRepo.DidNotReceive().UpsertAsync(Arg.Any<ClientRef>(), Arg.Any<CancellationToken>());
+        await inbox.DidNotReceive().MarkProcessedAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
         await uow.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 }

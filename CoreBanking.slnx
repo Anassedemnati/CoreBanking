@@ -3,6 +3,7 @@
   <Folder Name="/services/clients/">
     <Project Path="services/clients/CoreBanking.Clients.Api/CoreBanking.Clients.Api.csproj" />
     <Project Path="services/clients/CoreBanking.Clients.Application/CoreBanking.Clients.Application.csproj" />
+    <Project Path="services/clients/CoreBanking.Clients.Contracts/CoreBanking.Clients.Contracts.csproj" />
     <Project Path="services/clients/CoreBanking.Clients.Domain/CoreBanking.Clients.Domain.csproj" />
     <Project Path="services/clients/CoreBanking.Clients.Infrastructure/CoreBanking.Clients.Infrastructure.csproj" />
   </Folder>
@@ -23,6 +24,7 @@
   <Folder Name="/services/savings-products/">
     <Project Path="services/savings-products/CoreBanking.Products.Api/CoreBanking.Products.Api.csproj" />
     <Project Path="services/savings-products/CoreBanking.Products.Application/CoreBanking.Products.Application.csproj" />
+    <Project Path="services/savings-products/CoreBanking.Products.Contracts/CoreBanking.Products.Contracts.csproj" />
     <Project Path="services/savings-products/CoreBanking.Products.Domain/CoreBanking.Products.Domain.csproj" />
     <Project Path="services/savings-products/CoreBanking.Products.Infrastructure/CoreBanking.Products.Infrastructure.csproj" />
   </Folder>

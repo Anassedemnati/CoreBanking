@@ -3,6 +3,7 @@ using CoreBanking.BuildingBlocks.Domain;
 using CoreBanking.BuildingBlocks.Infrastructure;
 using CoreBanking.BuildingBlocks.Messaging;
 using CoreBanking.Clients.Application;
+using CoreBanking.Clients.Contracts;
 using CoreBanking.Clients.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

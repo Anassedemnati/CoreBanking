@@ -1,6 +1,6 @@
 using CoreBanking.BuildingBlocks.Messaging;
 
-namespace CoreBanking.Clients.Infrastructure;
+namespace CoreBanking.Clients.Contracts;
 
 public sealed record ClientRegisteredIntegrationEvent(
     Guid EventId,

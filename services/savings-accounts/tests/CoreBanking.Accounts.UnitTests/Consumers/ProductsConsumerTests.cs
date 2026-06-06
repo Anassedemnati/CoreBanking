@@ -3,7 +3,7 @@ using CoreBanking.Accounts.Application.Abstractions;
 using CoreBanking.Accounts.Application.ReadModels;
 using CoreBanking.Accounts.Infrastructure.Consumers;
 using CoreBanking.BuildingBlocks.Infrastructure;
-using CoreBanking.Products.Infrastructure;
+using CoreBanking.Products.Contracts;
 using FluentAssertions;
 using NSubstitute;
 using Xunit;

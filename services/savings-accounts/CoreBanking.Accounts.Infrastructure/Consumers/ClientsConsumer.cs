@@ -5,7 +5,7 @@ using CoreBanking.Accounts.Application.Abstractions;
 using CoreBanking.Accounts.Application.ReadModels;
 using CoreBanking.BuildingBlocks.Infrastructure;
 using CoreBanking.BuildingBlocks.Messaging.Kafka;
-using CoreBanking.Clients.Infrastructure;
+using CoreBanking.Clients.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -109,7 +109,13 @@ public sealed class ClientsConsumer(
                 var e = JsonSerializer.Deserialize<ClientActivatedIntegrationEvent>(payload)!;
                 if (await inboxService.HasProcessedAsync(e.EventId, ct)) return;
                 var existing = await clientRefRepo.FindAsync(e.ClientId, ct);
-                if (existing is null) return;
+                if (existing is null)
+                {
+                    // ClientRegistered hasn't arrived yet (out-of-order). Mark processed to avoid infinite retry.
+                    await inboxService.MarkProcessedAsync(e.EventId, typeName, ct);
+                    await uow.SaveChangesAsync(ct);
+                    return;
+                }
                 existing.IsActive = true;
                 existing.EventVersion = e.Version;
                 await clientRefRepo.UpsertAsync(existing, ct);

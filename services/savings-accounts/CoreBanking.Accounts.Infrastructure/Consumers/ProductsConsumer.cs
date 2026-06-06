@@ -5,7 +5,7 @@ using CoreBanking.Accounts.Application.Abstractions;
 using CoreBanking.Accounts.Application.ReadModels;
 using CoreBanking.BuildingBlocks.Infrastructure;
 using CoreBanking.BuildingBlocks.Messaging.Kafka;
-using CoreBanking.Products.Infrastructure;
+using CoreBanking.Products.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
