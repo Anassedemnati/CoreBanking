@@ -13,7 +13,6 @@ public sealed class CorrelationIdMiddleware(RequestDelegate next)
         }
 
         context.Request.Headers[HeaderName] = correlationId;
-        context.Response.Headers[HeaderName] = correlationId;
         context.Response.OnStarting(() =>
         {
             context.Response.Headers[HeaderName] = correlationId;
