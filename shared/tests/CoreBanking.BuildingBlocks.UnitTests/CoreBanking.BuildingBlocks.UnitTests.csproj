@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\CoreBanking.BuildingBlocks.Domain\CoreBanking.BuildingBlocks.Domain.csproj" />
+    <ProjectReference Include="..\..\CoreBanking.BuildingBlocks.Application\CoreBanking.BuildingBlocks.Application.csproj" />
   </ItemGroup>
 
 </Project>
