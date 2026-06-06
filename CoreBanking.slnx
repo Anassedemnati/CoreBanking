@@ -6,6 +6,7 @@
     <Project Path="shared/CoreBanking.BuildingBlocks.Messaging/CoreBanking.BuildingBlocks.Messaging.csproj" />
   </Folder>
   <Folder Name="/shared/tests/">
+    <Project Path="shared/tests/CoreBanking.BuildingBlocks.IntegrationTests/CoreBanking.BuildingBlocks.IntegrationTests.csproj" />
     <Project Path="shared/tests/CoreBanking.BuildingBlocks.UnitTests/CoreBanking.BuildingBlocks.UnitTests.csproj" />
   </Folder>
 </Solution>
