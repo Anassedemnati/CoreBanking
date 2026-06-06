@@ -1,4 +1,15 @@
 <Solution>
+  <Folder Name="/services/" />
+  <Folder Name="/services/clients/">
+    <Project Path="services/clients/CoreBanking.Clients.Api/CoreBanking.Clients.Api.csproj" />
+    <Project Path="services/clients/CoreBanking.Clients.Application/CoreBanking.Clients.Application.csproj" />
+    <Project Path="services/clients/CoreBanking.Clients.Domain/CoreBanking.Clients.Domain.csproj" />
+    <Project Path="services/clients/CoreBanking.Clients.Infrastructure/CoreBanking.Clients.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/services/clients/tests/">
+    <Project Path="services/clients/tests/CoreBanking.Clients.IntegrationTests/CoreBanking.Clients.IntegrationTests.csproj" />
+    <Project Path="services/clients/tests/CoreBanking.Clients.UnitTests/CoreBanking.Clients.UnitTests.csproj" />
+  </Folder>
   <Folder Name="/shared/">
     <Project Path="shared/CoreBanking.BuildingBlocks.Application/CoreBanking.BuildingBlocks.Application.csproj" />
     <Project Path="shared/CoreBanking.BuildingBlocks.Domain/CoreBanking.BuildingBlocks.Domain.csproj" />
