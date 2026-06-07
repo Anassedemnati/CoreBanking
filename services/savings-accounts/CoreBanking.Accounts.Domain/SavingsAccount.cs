@@ -141,7 +141,7 @@ public sealed class SavingsAccount : AggregateRoot, IAuditable
             throw new DomainException("account.postinterest.notactive",
                 $"Cannot post interest on an account in {Status} status.");
         if (asOf > today)
-            throw new DomainException("account.transaction.future",
+            throw new DomainException("account.postinterest.future",
                 "Interest posting date cannot be in the future.");
 
         var start = InterestPostedTillDate?.AddDays(1) ?? ActivatedOn!.Value;
