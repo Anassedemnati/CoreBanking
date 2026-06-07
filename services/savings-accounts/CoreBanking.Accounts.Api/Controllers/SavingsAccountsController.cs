@@ -199,6 +199,105 @@ public sealed class SavingsAccountsController(IMediator mediator) : ControllerBa
         return NoContent();
     }
 
+    /// <summary>Deposit money into an active savings account.</summary>
+    /// <remarks>
+    /// Adds a credit transaction and updates the account balance. Backdated deposits are
+    /// allowed back to (but not on or before) the interest posting pivot date.
+    ///
+    /// **Mandatory fields:**
+    /// - <c>transactionDate</c> — value date, not in the future, not before activation.
+    /// - <c>amount</c> — strictly positive, in the account currency.
+    ///
+    /// Corresponds to Fineract <c>POST /v1/savingsaccounts/{accountId}/transactions?command=deposit</c>.
+    /// </remarks>
+    /// <param name="id">Unique identifier of the savings account.</param>
+    /// <param name="body">Transaction payload.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <response code="200">Deposit recorded; returns the transaction id.</response>
+    /// <response code="404">No savings account found with the given <c>id</c>.</response>
+    /// <response code="422">
+    /// Business rule violation: <c>account.transaction.notactive</c>, <c>account.transaction.future</c>,
+    /// <c>account.transaction.beforeactivation</c>, <c>account.transaction.beforepivot</c>,
+    /// <c>account.transaction.amount.invalid</c>.
+    /// </response>
+    [HttpPost("{id:guid}/transactions/deposit")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> Deposit(Guid id, [FromBody] TransactionRequest body, CancellationToken ct)
+    {
+        var txId = await mediator.Send(
+            new DepositToSavingsAccountCommand(id, body.TransactionDate, body.Amount), ct);
+        return Ok(new { transactionId = txId });
+    }
+
+    /// <summary>Withdraw money from an active savings account.</summary>
+    /// <remarks>
+    /// Adds a debit transaction. The running balance may never go negative at any point in
+    /// the transaction timeline — including for backdated withdrawals — otherwise the
+    /// operation is rejected (error code <c>account.balance.insufficient</c>).
+    ///
+    /// Corresponds to Fineract <c>POST /v1/savingsaccounts/{accountId}/transactions?command=withdrawal</c>.
+    /// </remarks>
+    /// <param name="id">Unique identifier of the savings account.</param>
+    /// <param name="body">Transaction payload.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <response code="200">Withdrawal recorded; returns the transaction id.</response>
+    /// <response code="404">No savings account found with the given <c>id</c>.</response>
+    /// <response code="422">Insufficient balance or transaction-date rule violation.</response>
+    [HttpPost("{id:guid}/transactions/withdraw")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> WithdrawMoney(Guid id, [FromBody] TransactionRequest body, CancellationToken ct)
+    {
+        var txId = await mediator.Send(
+            new WithdrawFromSavingsAccountCommand(id, body.TransactionDate, body.Amount), ct);
+        return Ok(new { transactionId = txId });
+    }
+
+    /// <summary>Calculate and post interest for all completed posting periods up to a date.</summary>
+    /// <remarks>
+    /// Posts one interest transaction per completed posting period (dated the period end) and
+    /// advances the interest pivot date. Partial trailing periods accrue and are posted on a
+    /// later run. Idempotent: re-running with the same date posts nothing new.
+    ///
+    /// Corresponds to Fineract <c>POST /v1/savingsaccounts/{accountId}?command=postInterest</c>.
+    /// </remarks>
+    /// <param name="id">Unique identifier of the savings account.</param>
+    /// <param name="body">Posting date payload.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <response code="204">Interest posted (or no completed period was pending).</response>
+    /// <response code="404">No savings account found with the given <c>id</c>.</response>
+    /// <response code="422">Account is not active (<c>account.postinterest.notactive</c>).</response>
+    [HttpPost("{id:guid}/postinterest")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> PostInterest(Guid id, [FromBody] PostInterestRequest body, CancellationToken ct)
+    {
+        await mediator.Send(new PostInterestToSavingsAccountCommand(id, body.AsOf), ct);
+        return NoContent();
+    }
+
+    /// <summary>List the account's transactions in chronological order.</summary>
+    /// <remarks>
+    /// Returns deposits, withdrawals and interest postings ordered by transaction date,
+    /// each with its running balance at that point in the timeline.
+    ///
+    /// Corresponds to Fineract <c>GET /v1/savingsaccounts/{accountId}/transactions</c>.
+    /// </remarks>
+    /// <param name="id">Unique identifier of the savings account.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <response code="200">Transactions returned (empty list when none exist).</response>
+    [HttpGet("{id:guid}/transactions")]
+    [ProducesResponseType(typeof(IReadOnlyList<SavingsTransactionDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetTransactions(Guid id, CancellationToken ct)
+    {
+        var txs = await mediator.Send(new GetSavingsAccountTransactionsQuery(id), ct);
+        return Ok(txs);
+    }
+
     /// <summary>
     /// Retrieve a savings account by ID.
     /// </summary>
@@ -251,3 +350,12 @@ public sealed record RejectAccountRequest(DateOnly RejectedOn);
 /// Must be on or after the account's <c>submittedOn</c> date.
 /// </param>
 public sealed record WithdrawAccountRequest(DateOnly WithdrawnOn);
+
+/// <summary>Request body for deposit and withdrawal operations.</summary>
+/// <param name="TransactionDate">Value date of the transaction (not in the future).</param>
+/// <param name="Amount">Strictly positive amount in the account currency.</param>
+public sealed record TransactionRequest(DateOnly TransactionDate, decimal Amount);
+
+/// <summary>Request body for the post-interest operation.</summary>
+/// <param name="AsOf">Post interest for all posting periods ending on or before this date.</param>
+public sealed record PostInterestRequest(DateOnly AsOf);
