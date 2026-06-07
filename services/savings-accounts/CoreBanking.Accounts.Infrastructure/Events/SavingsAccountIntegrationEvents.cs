@@ -78,6 +78,19 @@ public sealed record SavingsDepositedIntegrationEvent(
     public override string AggregateKey => AccountId.ToString();
 }
 
+public sealed record SavingsAccountClosedIntegrationEvent(
+    Guid EventId,
+    DateTimeOffset OccurredOnUtc,
+    long Version,
+    Guid AccountId,
+    DateOnly ClosedOn,
+    decimal BalanceAfter)
+    : IntegrationEvent(EventId, OccurredOnUtc, Version)
+{
+    public override string Topic => "savings-accounts.events";
+    public override string AggregateKey => AccountId.ToString();
+}
+
 public sealed record SavingsWithdrawnIntegrationEvent(
     Guid EventId,
     DateTimeOffset OccurredOnUtc,

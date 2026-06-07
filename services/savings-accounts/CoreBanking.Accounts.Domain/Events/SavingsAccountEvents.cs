@@ -7,6 +7,7 @@ public sealed record SavingsAccountApproved(Guid AccountId, DateOnly ApprovedOn)
 public sealed record SavingsAccountActivated(Guid AccountId, DateOnly ActivatedOn) : IDomainEvent;
 public sealed record SavingsAccountRejected(Guid AccountId, DateOnly RejectedOn) : IDomainEvent;
 public sealed record SavingsAccountWithdrawn(Guid AccountId, DateOnly WithdrawnOn) : IDomainEvent;
+public sealed record SavingsAccountClosed(Guid AccountId, DateOnly ClosedOn, decimal BalanceAfter) : IDomainEvent;
 
 public sealed record SavingsDeposited(Guid AccountId, Guid TransactionId, DateOnly On, decimal Amount, decimal BalanceAfter) : IDomainEvent;
 public sealed record SavingsWithdrawn(Guid AccountId, Guid TransactionId, DateOnly On, decimal Amount, decimal BalanceAfter) : IDomainEvent;

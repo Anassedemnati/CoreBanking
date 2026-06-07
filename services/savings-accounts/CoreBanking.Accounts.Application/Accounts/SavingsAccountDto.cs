@@ -14,4 +14,5 @@ public sealed record SavingsAccountDto(
     DateOnly? RejectedOn,
     DateOnly? WithdrawnOn,
     decimal AccountBalance,
-    DateOnly? InterestPostedTillDate);
+    DateOnly? InterestPostedTillDate,
+    DateOnly? ClosedOn);

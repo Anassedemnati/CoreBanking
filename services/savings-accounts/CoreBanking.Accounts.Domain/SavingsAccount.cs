@@ -27,6 +27,7 @@ public sealed class SavingsAccount : AggregateRoot, IAuditable
     public DateOnly? ActivatedOn { get; private set; }
     public DateOnly? RejectedOn { get; private set; }
     public DateOnly? WithdrawnOn { get; private set; }
+    public DateOnly? ClosedOn { get; private set; }
 
     // IAuditable
     public DateTimeOffset CreatedOnUtc { get; set; }
@@ -115,10 +116,19 @@ public sealed class SavingsAccount : AggregateRoot, IAuditable
     {
         EnsureTransactionAllowed(on, today);
         EnsurePositive(amount);
+        var tx = InsertWithdrawalUnchecked(on, amount);
+        Raise(new SavingsWithdrawn(Id, tx.Id, on, amount, AccountBalance));
+        return tx.Id;
+    }
 
-        // Simulate: replay the timeline with the candidate withdrawal inserted (Fineract
-        // validateAccountBalanceConstraints) — reject if balance dips below zero at ANY point.
-        var candidate = SavingsAccountTransaction.Create(Id, SavingsTransactionType.Withdrawal, on, amount, NextTransactionSequence());
+    // Inserts a withdrawal candidate, asserts the full-timeline balance never goes
+    // negative (Fineract validateAccountBalanceConstraints), commits it, and recomputes
+    // running balances. Raises NO event and applies NO status/date/pivot guards —
+    // callers (WithdrawMoney, the close-settle) decide which guards run first.
+    private SavingsAccountTransaction InsertWithdrawalUnchecked(DateOnly on, decimal amount)
+    {
+        var candidate = SavingsAccountTransaction.Create(
+            Id, SavingsTransactionType.Withdrawal, on, amount, NextTransactionSequence());
         decimal balance = 0m;
         foreach (var t in _transactions.Append(candidate)
                      .OrderBy(x => x.TransactionDate).ThenBy(x => x.Sequence))
@@ -128,11 +138,9 @@ public sealed class SavingsAccount : AggregateRoot, IAuditable
                 throw new DomainException("account.balance.insufficient",
                     $"Insufficient balance for a withdrawal of {amount} on {on:yyyy-MM-dd}.");
         }
-
         _transactions.Add(candidate);
         RebuildRunningBalances();
-        Raise(new SavingsWithdrawn(Id, candidate.Id, on, amount, AccountBalance));
-        return candidate.Id;
+        return candidate;
     }
 
     public void PostInterest(DateOnly asOf, DateOnly today)
@@ -163,6 +171,37 @@ public sealed class SavingsAccount : AggregateRoot, IAuditable
             }
             InterestPostedTillDate = periodEnd;
         }
+    }
+
+    public void Close(DateOnly closedOn, bool withdrawBalance, DateOnly today)
+    {
+        if (Status != SavingsAccountStatus.Active)
+            throw new DomainException("account.close.notactive",
+                $"Cannot close an account in {Status} status.");
+        if (closedOn < ActivatedOn!.Value)
+            throw new DomainException("account.close.beforeactivation",
+                "Close date cannot be before the account's activation date.");
+        if (closedOn > today)
+            throw new DomainException("account.close.future",
+                "Close date cannot be in the future.");
+        if (_transactions.Count > 0)
+        {
+            var lastTransactionDate = _transactions.Max(t => t.TransactionDate);
+            if (closedOn < lastTransactionDate)
+                throw new DomainException("account.close.afterlasttransaction",
+                    "Close date cannot be before the last transaction date.");
+        }
+
+        if (withdrawBalance && AccountBalance > 0m)
+            InsertWithdrawalUnchecked(closedOn, AccountBalance);   // pivot-exempt, no event
+
+        if (AccountBalance != 0m)
+            throw new DomainException("account.close.balance.nonzero",
+                "Account balance must be zero to close. Sweep funds or pass withdrawBalance=true.");
+
+        Status = SavingsAccountStatus.Closed;
+        ClosedOn = closedOn;
+        Raise(new SavingsAccountClosed(Id, closedOn, AccountBalance));
     }
 
     private void EnsureTransactionAllowed(DateOnly on, DateOnly today)

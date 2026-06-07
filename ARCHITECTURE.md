@@ -69,7 +69,7 @@ flowchart TB
 |---|---|---|---|---|---|
 | **Clients** | `CoreBanking.Clients` | `:5101` `/api/v1/clients` | `CLIENTS` | `ClientRegistered`, `ClientActivated` → `clients.events` | — |
 | **Savings Products** | `CoreBanking.Products` | `:5102` `/api/v1/savingsproducts` | `PRODUCTS` | `SavingsProductCreated` → `products.events` | — |
-| **Savings Accounts** | `CoreBanking.Accounts` | `:5103` `/api/v1/savingsaccounts` | `SAVINGS` | `SavingsAccountSubmitted/Approved/Activated/Rejected/Withdrawn`, `SavingsDeposited`, `SavingsWithdrawn`, `SavingsInterestPosted` → `savings-accounts.events` | `clients.events`, `products.events` |
+| **Savings Accounts** | `CoreBanking.Accounts` | `:5103` `/api/v1/savingsaccounts` | `SAVINGS` | `SavingsAccountSubmitted/Approved/Activated/Rejected/Withdrawn/Closed`, `SavingsDeposited`, `SavingsWithdrawn`, `SavingsInterestPosted` → `savings-accounts.events` | `clients.events`, `products.events` |
 | **Gateway** | `CoreBanking.Gateway` | `:5100` | — | — | — |
 
 > Directory ≠ namespace: `services/savings-accounts/` → `CoreBanking.Accounts.*`, `services/savings-products/` → `CoreBanking.Products.*`.
@@ -89,6 +89,7 @@ flowchart TB
 | `POST /api/v1/savingsaccounts/{id}/activate` | Accounts | Activate |
 | `POST /api/v1/savingsaccounts/{id}/reject` | Accounts | Reject |
 | `POST /api/v1/savingsaccounts/{id}/withdraw` | Accounts | Withdraw application |
+| `POST /api/v1/savingsaccounts/{id}/close` | Accounts | Close account |
 | `POST /api/v1/savingsaccounts/{id}/transactions/deposit` | Accounts | Deposit money |
 | `POST /api/v1/savingsaccounts/{id}/transactions/withdraw` | Accounts | Withdraw money |
 | `POST /api/v1/savingsaccounts/{id}/postinterest` | Accounts | Post interest (idempotent) |
@@ -214,14 +215,17 @@ stateDiagram-v2
     Submitted --> Withdrawn : Withdraw()
     Approved --> Active : Activate()
     Active --> Active : Deposit() / WithdrawMoney() / PostInterest()
+    Active --> Closed : Close()
     Rejected --> [*]
     Withdrawn --> [*]
+    Closed --> [*]
 
     note right of Submitted : status 100
     note right of Approved : status 200
     note right of Active : status 300 — only state that accepts transactions
     note right of Withdrawn : status 400
     note right of Rejected : status 500
+    note right of Closed : status 600 — terminal
 ```
 
 **Transactions & interest** (only while `Active`):
@@ -229,6 +233,8 @@ stateDiagram-v2
 - Withdrawals are validated against the **full timeline**: the balance may never go negative at any point (including for backdated entries) → `account.balance.insufficient`.
 - Interest uses the **daily-balance** method, all in `decimal` (no `Math.Pow`): daily or monthly compounding, calendar posting periods (monthly/quarterly/biannual/annual), 360/365 day-count, `AwayFromZero` rounding applied only when a posting transaction is created. The pure engine is in `Domain/Interest/` (`PostingPeriodCalculator`, `InterestEngine`, `InterestCalculator`).
 - **Forward-only** posting via the `InterestPostedTillDate` pivot: posted periods are immutable; any transaction dated on/before the pivot is rejected (`account.transaction.beforepivot`). Re-running `PostInterest` for the same date is idempotent.
+
+**Closure** (`Active → Closed`, status 600 — terminal): `Close(closedOn, withdrawBalance, today)` validates the close date (not future, not before activation, not before the last transaction), requires a **zero balance** (`account.close.balance.nonzero`), and — when `withdrawBalance=true` — first sweeps the remaining balance to zero with a **pivot-exempt** settle-withdrawal dated `closedOn` (it shares `InsertWithdrawalUnchecked` with `WithdrawMoney` but raises no `SavingsWithdrawn`; the final balance rides on `SavingsAccountClosed.BalanceAfter`). Raises `SavingsAccountClosed`. A `Closed` account is terminal — no further transitions or transactions.
 
 Domain methods take `today`/dates as parameters (clock-free); handlers supply them from `IDateTimeProvider`.
 
@@ -254,6 +260,7 @@ erDiagram
 - Each service has a **Write** DbContext (primary, owns migrations) and a **Read** DbContext (replica, `NoTracking`): `ClientsWriteDbContext`/`ClientsReadDbContext`, `SavingsProductsWriteDbContext`/`SavingsProductsReadDbContext`, `SavingsAccountsWriteDbContext`/`SavingsAccountsReadDbContext`. Connection strings: `ConnectionStrings:Primary` / `ConnectionStrings:Replica` (identical on the `free` profile).
 - Migrations live under each Infrastructure project's `Persistence/Migrations/`. See `CLAUDE.md` for the `dotnet ef migrations add` invocation.
 - Oracle conventions: money/rates `NUMBER(19,6)`, enums `NUMBER`, GUID keys `RAW(16)` (sequential v7 GUIDs), optimistic concurrency via a `Version` token → 409.
+- `SAVINGS_ACCOUNTS` carries the lifecycle dates (`APPROVEDON`, `ACTIVATEDON`, `REJECTEDON`, `WITHDRAWNON`, and the closure date `CLOSEDON`) as nullable `NVARCHAR2(10)` (`DateOnly`).
 
 ---
 

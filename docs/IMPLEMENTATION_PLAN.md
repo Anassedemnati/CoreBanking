@@ -29,6 +29,8 @@ The savings-creation slice decomposes into three bounded contexts:
 > - **Forward-only posting** with an `InterestPostedTillDate` pivot: posted periods are immutable; transactions dated on/before the pivot are rejected (`account.transaction.beforepivot`).
 > - Endpoints: `POST {id}/transactions/deposit`, `POST {id}/transactions/withdraw`, `POST {id}/postinterest`, `GET {id}/transactions`.
 > - Integration events `SavingsDeposited` / `SavingsWithdrawn` / `SavingsInterestPosted` published to `savings-accounts.events` via the outbox.
+>
+> **Implemented (June 2026): savings account closure** — `POST {id}/close` transitions an `Active` account to the terminal `Closed` (600) state, validating the close date and requiring a zero balance (optionally sweeping the remaining balance to zero on close); publishes `SavingsAccountClosed` to `savings-accounts.events` via the outbox. The `CLOSEDON` date is persisted on `SAVINGS_ACCOUNTS`.
 
 They sit behind an **API Gateway (YARP)** and communicate **hybrid-style**: asynchronous **integration events over Apache Kafka** (with a per-service transactional **outbox**) keep **local read-model copies** of the Client/Product reference data inside the Savings Accounts service, so opening an account validates against that service's **own** store — autonomous and resilient. Because the reference topics are **log-compacted**, a read model can be rebuilt at any time by replaying the log. A synchronous fallback is used only where strong consistency is required.
 
@@ -284,7 +286,7 @@ stateDiagram-v2
     SubmittedAndPendingApproval --> Withdrawn : Withdraw
     Approved --> Active : Activate
     Approved --> SubmittedAndPendingApproval : UndoApproval
-    Active --> Closed : Close (future)
+    Active --> Closed : Close
     Rejected --> [*]
     Withdrawn --> [*]
     Closed --> [*]

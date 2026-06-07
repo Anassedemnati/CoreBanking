@@ -18,7 +18,7 @@ namespace CoreBanking.Accounts.Api.Controllers;
 /// | 300  | Active    | Account is fully operational.                            |
 /// | 400  | Withdrawn | Applicant withdrew the application before approval.      |
 /// | 500  | Rejected  | Institution rejected the application.                    |
-/// | 600  | Closed    | Account has been closed (future use).                    |
+/// | 600  | Closed    | Account has been closed (terminal).                      |
 ///
 /// **Valid transitions:**
 /// - Submit → Submitted (100)
@@ -26,6 +26,7 @@ namespace CoreBanking.Accounts.Api.Controllers;
 /// - Approved  → Active (300) via <c>activate</c>
 /// - Submitted → Rejected (500) via <c>reject</c>
 /// - Submitted → Withdrawn (400) via <c>withdraw</c>
+/// - Active    → Closed (600) via <c>close</c> — terminal; the balance must be zero (or swept on close).
 ///
 /// All other transitions return <c>422 Unprocessable Entity</c>.
 ///
@@ -287,6 +288,29 @@ public sealed class SavingsAccountsController(IMediator mediator) : ControllerBa
         return NoContent();
     }
 
+    /// <summary>Close an active savings account.</summary>
+    /// <remarks>
+    /// Corresponds to Fineract <c>POST /v1/savingsaccounts/{accountId}?command=close</c>.
+    /// Validates the close date, optionally sweeps the remaining balance to zero (dated the close
+    /// date, pivot-exempt), then transitions the account to the terminal <c>Closed</c> (600) state.
+    /// </remarks>
+    /// <response code="204">Account closed.</response>
+    /// <response code="404">Account not found.</response>
+    /// <response code="422">
+    /// Business rule violation: <c>account.close.notactive</c>, <c>account.close.beforeactivation</c>,
+    /// <c>account.close.future</c>, <c>account.close.afterlasttransaction</c>,
+    /// <c>account.close.balance.nonzero</c>.
+    /// </response>
+    [HttpPost("{id:guid}/close")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> Close(Guid id, [FromBody] CloseAccountRequest body, CancellationToken ct)
+    {
+        await mediator.Send(new CloseSavingsAccountCommand(id, body.ClosedOn, body.WithdrawBalance), ct);
+        return NoContent();
+    }
+
     /// <summary>List the account's transactions in chronological order.</summary>
     /// <remarks>
     /// Returns deposits, withdrawals and interest postings ordered by transaction date,
@@ -366,3 +390,8 @@ public sealed record TransactionRequest(DateOnly TransactionDate, decimal Amount
 /// <summary>Request body for the post-interest operation.</summary>
 /// <param name="AsOf">Post interest for all posting periods ending on or before this date.</param>
 public sealed record PostInterestRequest(DateOnly AsOf);
+
+/// <summary>Request body for the close-account operation.</summary>
+/// <param name="ClosedOn">Close date — not in the future, not before activation or the last transaction.</param>
+/// <param name="WithdrawBalance">When true, sweep any remaining balance to zero (dated <c>ClosedOn</c>) before closing.</param>
+public sealed record CloseAccountRequest(DateOnly ClosedOn, bool WithdrawBalance = false);
