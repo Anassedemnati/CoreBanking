@@ -18,7 +18,7 @@ namespace CoreBanking.Accounts.Api.Controllers;
 /// | 300  | Active    | Account is fully operational.                            |
 /// | 400  | Withdrawn | Applicant withdrew the application before approval.      |
 /// | 500  | Rejected  | Institution rejected the application.                    |
-/// | 600  | Closed    | Account has been closed (future use).                    |
+/// | 600  | Closed    | Account has been closed (terminal).                      |
 ///
 /// **Valid transitions:**
 /// - Submit → Submitted (100)
@@ -26,6 +26,7 @@ namespace CoreBanking.Accounts.Api.Controllers;
 /// - Approved  → Active (300) via <c>activate</c>
 /// - Submitted → Rejected (500) via <c>reject</c>
 /// - Submitted → Withdrawn (400) via <c>withdraw</c>
+/// - Active    → Closed (600) via <c>close</c> — terminal; the balance must be zero (or swept on close).
 ///
 /// All other transitions return <c>422 Unprocessable Entity</c>.
 ///
