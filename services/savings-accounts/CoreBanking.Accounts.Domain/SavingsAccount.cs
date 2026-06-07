@@ -110,6 +110,30 @@ public sealed class SavingsAccount : AggregateRoot, IAuditable
         return tx.Id;
     }
 
+    public Guid WithdrawMoney(DateOnly on, decimal amount, DateOnly today)
+    {
+        EnsureTransactionAllowed(on, today);
+        EnsurePositive(amount);
+
+        // Simulate: replay the timeline with the candidate withdrawal inserted (Fineract
+        // validateAccountBalanceConstraints) — reject if balance dips below zero at ANY point.
+        var candidate = SavingsAccountTransaction.Create(Id, SavingsTransactionType.Withdrawal, on, amount);
+        decimal balance = 0m;
+        foreach (var t in _transactions.Append(candidate)
+                     .OrderBy(x => x.TransactionDate).ThenBy(x => x.Id))
+        {
+            balance += t.IsCredit ? t.Amount : -t.Amount;
+            if (balance < 0m)
+                throw new DomainException("account.balance.insufficient",
+                    $"Insufficient balance for a withdrawal of {amount} on {on:yyyy-MM-dd}.");
+        }
+
+        _transactions.Add(candidate);
+        RebuildRunningBalances();
+        Raise(new SavingsWithdrawn(Id, candidate.Id, on, amount, AccountBalance));
+        return candidate.Id;
+    }
+
     private void EnsureTransactionAllowed(DateOnly on, DateOnly today)
     {
         if (Status != SavingsAccountStatus.Active)

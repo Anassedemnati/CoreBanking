@@ -116,4 +116,44 @@ public sealed class SavingsAccountDepositWithdrawTests
         account.InterestPostedTillDate.Should().BeNull();
         account.Transactions.Should().BeEmpty();
     }
+
+    [Fact]
+    public void WithdrawMoney_with_sufficient_balance_succeeds_and_raises_event()
+    {
+        var a = MakeActive();
+        a.Deposit(new DateOnly(2026, 1, 10), 1000m, Today);
+
+        var txId = a.WithdrawMoney(new DateOnly(2026, 1, 20), 400m, Today);
+
+        a.AccountBalance.Should().Be(600m);
+        a.Transactions.Should().Contain(t => t.Id == txId && t.Type == SavingsTransactionType.Withdrawal);
+        a.DomainEvents.OfType<SavingsWithdrawn>().Should().ContainSingle()
+            .Which.BalanceAfter.Should().Be(600m);
+    }
+
+    [Fact]
+    public void WithdrawMoney_exceeding_balance_throws_insufficient()
+    {
+        var a = MakeActive();
+        a.Deposit(new DateOnly(2026, 1, 10), 100m, Today);
+
+        var act = () => a.WithdrawMoney(new DateOnly(2026, 1, 20), 100.01m, Today);
+
+        act.Should().Throw<DomainException>().Which.Code.Should().Be("account.balance.insufficient");
+        a.AccountBalance.Should().Be(100m);
+        a.Transactions.Should().HaveCount(1); // failed withdrawal left no trace
+    }
+
+    [Fact]
+    public void Backdated_withdrawal_that_would_overdraw_past_timeline_throws()
+    {
+        var a = MakeActive();
+        a.Deposit(new DateOnly(2026, 1, 10), 100m, Today);
+        a.Deposit(new DateOnly(2026, 3, 1), 1000m, Today);
+
+        // balance today is 1100, but on Feb 1 it was only 100
+        var act = () => a.WithdrawMoney(new DateOnly(2026, 2, 1), 500m, Today);
+
+        act.Should().Throw<DomainException>().Which.Code.Should().Be("account.balance.insufficient");
+    }
 }
