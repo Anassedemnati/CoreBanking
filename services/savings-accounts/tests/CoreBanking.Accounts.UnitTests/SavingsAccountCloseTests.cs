@@ -32,8 +32,24 @@ public sealed class SavingsAccountCloseTests
 
         a.Status.Should().Be(SavingsAccountStatus.Closed);
         a.ClosedOn.Should().Be(new DateOnly(2026, 2, 1));
-        a.DomainEvents.OfType<SavingsAccountClosed>().Should().ContainSingle()
-            .Which.BalanceAfter.Should().Be(0m);
+        var closedEvent = a.DomainEvents.OfType<SavingsAccountClosed>().Should().ContainSingle().Subject;
+        closedEvent.BalanceAfter.Should().Be(0m);
+        closedEvent.ClosedOn.Should().Be(new DateOnly(2026, 2, 1));
+    }
+
+    [Fact] // AC-3 variant — Task 1 has NO sweep: non-zero balance is rejected even with withdrawBalance:true
+    public void Close_nonzero_balance_with_withdrawBalance_true_is_still_rejected_in_task1()
+    {
+        var a = MakeActive();
+        a.Deposit(new DateOnly(2026, 1, 10), 1000m, Today);
+        a.ClearDomainEvents();
+
+        var act = () => a.Close(new DateOnly(2026, 3, 15), withdrawBalance: true, Today);
+
+        act.Should().Throw<DomainException>().Which.Code.Should().Be("account.close.balance.nonzero");
+        a.Status.Should().Be(SavingsAccountStatus.Active);
+        a.Transactions.Should().HaveCount(1);            // no sweep transaction added (Task 2)
+        a.DomainEvents.Should().BeEmpty();
     }
 
     [Fact] // AC-11
