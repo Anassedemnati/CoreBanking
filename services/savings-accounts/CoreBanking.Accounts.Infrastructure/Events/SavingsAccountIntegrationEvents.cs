@@ -62,3 +62,48 @@ public sealed record SavingsAccountWithdrawnIntegrationEvent(
     public override string Topic => "savings-accounts.events";
     public override string AggregateKey => AccountId.ToString();
 }
+
+public sealed record SavingsDepositedIntegrationEvent(
+    Guid EventId,
+    DateTimeOffset OccurredOnUtc,
+    long Version,
+    Guid AccountId,
+    Guid TransactionId,
+    DateOnly TransactionDate,
+    decimal Amount,
+    decimal BalanceAfter)
+    : IntegrationEvent(EventId, OccurredOnUtc, Version)
+{
+    public override string Topic => "savings-accounts.events";
+    public override string AggregateKey => AccountId.ToString();
+}
+
+public sealed record SavingsWithdrawnIntegrationEvent(
+    Guid EventId,
+    DateTimeOffset OccurredOnUtc,
+    long Version,
+    Guid AccountId,
+    Guid TransactionId,
+    DateOnly TransactionDate,
+    decimal Amount,
+    decimal BalanceAfter)
+    : IntegrationEvent(EventId, OccurredOnUtc, Version)
+{
+    public override string Topic => "savings-accounts.events";
+    public override string AggregateKey => AccountId.ToString();
+}
+
+public sealed record SavingsInterestPostedIntegrationEvent(
+    Guid EventId,
+    DateTimeOffset OccurredOnUtc,
+    long Version,
+    Guid AccountId,
+    Guid TransactionId,
+    DateOnly PostedThrough,
+    decimal Amount,
+    decimal BalanceAfter)
+    : IntegrationEvent(EventId, OccurredOnUtc, Version)
+{
+    public override string Topic => "savings-accounts.events";
+    public override string AggregateKey => AccountId.ToString();
+}

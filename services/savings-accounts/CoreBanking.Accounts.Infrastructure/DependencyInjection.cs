@@ -73,6 +73,15 @@ public static class DependencyInjection
             SavingsAccountWithdrawn e => new SavingsAccountWithdrawnIntegrationEvent(
                 Guid.CreateVersion7(), DateTimeOffset.UtcNow, 1,
                 e.AccountId, e.WithdrawnOn),
+            SavingsDeposited e => new SavingsDepositedIntegrationEvent(
+                Guid.CreateVersion7(), DateTimeOffset.UtcNow, 1,
+                e.AccountId, e.TransactionId, e.On, e.Amount, e.BalanceAfter),
+            SavingsWithdrawn e => new SavingsWithdrawnIntegrationEvent(
+                Guid.CreateVersion7(), DateTimeOffset.UtcNow, 1,
+                e.AccountId, e.TransactionId, e.On, e.Amount, e.BalanceAfter),
+            SavingsInterestPosted e => new SavingsInterestPostedIntegrationEvent(
+                Guid.CreateVersion7(), DateTimeOffset.UtcNow, 1,
+                e.AccountId, e.TransactionId, e.PostedThrough, e.Amount, e.BalanceAfter),
             _ => null
         };
 }
