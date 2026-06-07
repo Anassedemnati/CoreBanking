@@ -8,9 +8,16 @@ public sealed class SavingsAccountTransaction : Entity
     public SavingsTransactionType Type { get; private set; }
     public DateOnly TransactionDate { get; private set; }
     public decimal Amount { get; private set; }
+    // Recomputed by SavingsAccount when the transaction timeline changes.
     public decimal RunningBalance { get; internal set; }
 
-    public bool IsCredit => Type is SavingsTransactionType.Deposit or SavingsTransactionType.InterestPosting;
+    public bool IsCredit => Type switch
+    {
+        SavingsTransactionType.Deposit => true,
+        SavingsTransactionType.Withdrawal => false,
+        SavingsTransactionType.InterestPosting => true,
+        _ => throw new InvalidOperationException($"IsCredit not defined for {Type}")
+    };
 
     private SavingsAccountTransaction(Guid id) : base(id) { }  // EF constructor
 
