@@ -1,0 +1,133 @@
+services:
+  kafka:
+    image: apache/kafka:latest
+    ports: ["9092:9092"]
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 > /dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+
+  kafka-ui:
+    image: kafbat/kafka-ui:latest
+    ports: ["8080:8080"]
+    environment:
+      KAFKA_CLUSTERS_0_NAME: corebanking
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+  kafka-init:
+    image: apache/kafka:latest
+    depends_on:
+      kafka:
+        condition: service_healthy
+    volumes:
+      - ./kafka/kafka-init.sh:/kafka-init.sh:ro
+    entrypoint: ["/bin/bash", "/kafka-init.sh"]
+    restart: "no"
+
+  # ── Oracle Free (profile: free) ────────────────────────────────────────────
+  oracle-free:
+    image: gvenzl/oracle-free:latest
+    profiles: ["free"]
+    ports: ["1521:1521"]
+    environment:
+      ORACLE_PASSWORD: ${ORACLE_PWD}
+    volumes:
+      - ./oracle/init:/container-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  # ── Oracle Enterprise / Active Data Guard (profile: dataguard) ─────────────
+  # Note: Active Data Guard standby configuration requires additional
+  # broker setup. See oracle/dataguard/README.md for full setup.
+  oracle-primary:
+    image: container-registry.oracle.com/database/enterprise:latest
+    profiles: ["dataguard"]
+    ports: ["1521:1521"]
+    environment:
+      ORACLE_PWD: ${ORACLE_PWD}
+      ORACLE_CHARACTERSET: AL32UTF8
+    volumes:
+      - ./oracle/init:/opt/oracle/scripts/startup
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 30
+
+  # ── Microservices ──────────────────────────────────────────────────────────
+  # Connection strings reference oracle-free by default.
+  # For the dataguard profile, override ConnectionStrings__Primary and
+  # ConnectionStrings__Replica via an .env file or environment variables,
+  # replacing the hostname with oracle-primary.
+
+  clients-svc:
+    build:
+      context: ..
+      dockerfile: services/clients/CoreBanking.Clients.Api/Dockerfile
+    ports: ["5101:8080"]
+    depends_on:
+      kafka:
+        condition: service_healthy
+      oracle-free:
+        condition: service_healthy
+    environment:
+      ConnectionStrings__Primary: "User Id=CLIENTS;Password=${ORACLE_PWD};Data Source=oracle-free:1521/FREEPDB1"
+      ConnectionStrings__Replica: "User Id=CLIENTS;Password=${ORACLE_PWD};Data Source=oracle-free:1521/FREEPDB1"
+      Kafka__BootstrapServers: "kafka:9092"
+
+  products-svc:
+    build:
+      context: ..
+      dockerfile: services/savings-products/CoreBanking.Products.Api/Dockerfile
+    ports: ["5102:8080"]
+    depends_on:
+      kafka:
+        condition: service_healthy
+      oracle-free:
+        condition: service_healthy
+    environment:
+      ConnectionStrings__Primary: "User Id=PRODUCTS;Password=${ORACLE_PWD};Data Source=oracle-free:1521/FREEPDB1"
+      ConnectionStrings__Replica: "User Id=PRODUCTS;Password=${ORACLE_PWD};Data Source=oracle-free:1521/FREEPDB1"
+      Kafka__BootstrapServers: "kafka:9092"
+
+  accounts-svc:
+    build:
+      context: ..
+      dockerfile: services/savings-accounts/CoreBanking.Accounts.Api/Dockerfile
+    ports: ["5103:8080"]
+    depends_on:
+      kafka:
+        condition: service_healthy
+      oracle-free:
+        condition: service_healthy
+    environment:
+      ConnectionStrings__Primary: "User Id=SAVINGS;Password=${ORACLE_PWD};Data Source=oracle-free:1521/FREEPDB1"
+      ConnectionStrings__Replica: "User Id=SAVINGS;Password=${ORACLE_PWD};Data Source=oracle-free:1521/FREEPDB1"
+      Kafka__BootstrapServers: "kafka:9092"
+
+  gateway:
+    build:
+      context: ..
+      dockerfile: gateway/CoreBanking.Gateway/Dockerfile
+    ports: ["5100:8080"]
+    depends_on: [clients-svc, products-svc, accounts-svc]
+    environment:
+      ReverseProxy__Clusters__clients-cluster__Destinations__primary__Address: "http://clients-svc:8080"
+      ReverseProxy__Clusters__products-cluster__Destinations__primary__Address: "http://products-svc:8080"
+      ReverseProxy__Clusters__accounts-cluster__Destinations__primary__Address: "http://accounts-svc:8080"

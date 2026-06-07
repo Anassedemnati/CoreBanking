@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../../../shared/CoreBanking.BuildingBlocks.Messaging/CoreBanking.BuildingBlocks.Messaging.csproj" />
+  </ItemGroup>
+</Project>
