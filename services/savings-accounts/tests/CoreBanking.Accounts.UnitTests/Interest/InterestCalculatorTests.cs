@@ -79,4 +79,26 @@ public sealed class InterestCalculatorTests
         // 1200 * (0.06/360) * 30 = 6.00
         interest.Should().BeApproximately(6.0m, 0.0001m);
     }
+
+    [Fact]
+    public void Daily_compounding_carries_accumulated_interest_across_spans()
+    {
+        // 5 days at 1000, then 5 days at 2000 — accrued interest from the first span
+        // keeps compounding in the second span.
+        var spans = new[]
+        {
+            new DailyBalanceSpan(new DateOnly(2026, 1, 1), 5, 1000m),
+            new DailyBalanceSpan(new DateOnly(2026, 1, 6), 5, 2000m)
+        };
+
+        var interest = InterestCalculator.Calculate(
+            spans, 5.0m, DaysInYearType.Days365, InterestCompoundingPeriod.Daily);
+
+        // hand-rolled replica of the iterative rule
+        var r = 5.0m / 100m / 365m;
+        var expected = 0m;
+        for (var d = 0; d < 5; d++) expected += (1000m + expected) * r;
+        for (var d = 0; d < 5; d++) expected += (2000m + expected) * r;
+        interest.Should().Be(expected);
+    }
 }

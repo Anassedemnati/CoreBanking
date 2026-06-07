@@ -117,10 +117,10 @@ public sealed class SavingsAccount : AggregateRoot, IAuditable
 
         // Simulate: replay the timeline with the candidate withdrawal inserted (Fineract
         // validateAccountBalanceConstraints) — reject if balance dips below zero at ANY point.
-        var candidate = SavingsAccountTransaction.Create(Id, SavingsTransactionType.Withdrawal, on, amount);
+        var candidate = SavingsAccountTransaction.Create(Id, SavingsTransactionType.Withdrawal, on, amount, NextTransactionSequence());
         decimal balance = 0m;
         foreach (var t in _transactions.Append(candidate)
-                     .OrderBy(x => x.TransactionDate).ThenBy(x => x.Id))
+                     .OrderBy(x => x.TransactionDate).ThenBy(x => x.Sequence))
         {
             balance += t.IsCredit ? t.Amount : -t.Amount;
             if (balance < 0m)
@@ -157,9 +157,12 @@ public sealed class SavingsAccount : AggregateRoot, IAuditable
                 "Amount must be greater than zero.");
     }
 
+    private int NextTransactionSequence()
+        => _transactions.Count == 0 ? 1 : _transactions.Max(t => t.Sequence) + 1;
+
     private SavingsAccountTransaction AddTransaction(SavingsTransactionType type, DateOnly on, decimal amount)
     {
-        var tx = SavingsAccountTransaction.Create(Id, type, on, amount);
+        var tx = SavingsAccountTransaction.Create(Id, type, on, amount, NextTransactionSequence());
         _transactions.Add(tx);
         RebuildRunningBalances();
         return tx;
@@ -168,7 +171,7 @@ public sealed class SavingsAccount : AggregateRoot, IAuditable
     private void RebuildRunningBalances()
     {
         decimal balance = 0m;
-        foreach (var t in _transactions.OrderBy(x => x.TransactionDate).ThenBy(x => x.Id))
+        foreach (var t in _transactions.OrderBy(x => x.TransactionDate).ThenBy(x => x.Sequence))
         {
             balance += t.IsCredit ? t.Amount : -t.Amount;
             t.RunningBalance = balance;

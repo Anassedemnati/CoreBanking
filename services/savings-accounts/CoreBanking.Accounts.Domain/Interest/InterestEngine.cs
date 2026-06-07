@@ -14,7 +14,7 @@ public static class InterestEngine
     {
         var ordered = transactions
             .Where(t => t.TransactionDate <= periodEnd)
-            .OrderBy(t => t.TransactionDate).ThenBy(t => t.Id)
+            .OrderBy(t => t.TransactionDate).ThenBy(t => t.Sequence)
             .ToList();
 
         // Opening balance = running balance after the last transaction strictly before the period.
@@ -34,7 +34,7 @@ public static class InterestEngine
                 spans.Add(new DailyBalanceSpan(cursor, group.Key.DayNumber - cursor.DayNumber, balance));
                 cursor = group.Key;
             }
-            balance = group.Last().RunningBalance; // groups preserve (date, id) source order
+            balance = group.Last().RunningBalance; // groups preserve (date, sequence) source order
         }
 
         spans.Add(new DailyBalanceSpan(cursor, periodEnd.DayNumber - cursor.DayNumber + 1, balance));

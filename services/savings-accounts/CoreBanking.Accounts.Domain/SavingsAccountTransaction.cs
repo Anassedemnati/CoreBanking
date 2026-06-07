@@ -5,6 +5,8 @@ namespace CoreBanking.Accounts.Domain;
 public sealed class SavingsAccountTransaction : Entity
 {
     public Guid AccountId { get; private set; }
+    /// <summary>Per-account insertion order; tie-breaks same-day transactions deterministically.</summary>
+    public int Sequence { get; private set; }
     public SavingsTransactionType Type { get; private set; }
     public DateOnly TransactionDate { get; private set; }
     public decimal Amount { get; private set; }
@@ -22,10 +24,11 @@ public sealed class SavingsAccountTransaction : Entity
     private SavingsAccountTransaction(Guid id) : base(id) { }  // EF constructor
 
     internal static SavingsAccountTransaction Create(
-        Guid accountId, SavingsTransactionType type, DateOnly transactionDate, decimal amount)
+        Guid accountId, SavingsTransactionType type, DateOnly transactionDate, decimal amount, int sequence)
         => new(Guid.CreateVersion7())
         {
             AccountId = accountId,
+            Sequence = sequence,
             Type = type,
             TransactionDate = transactionDate,
             Amount = amount

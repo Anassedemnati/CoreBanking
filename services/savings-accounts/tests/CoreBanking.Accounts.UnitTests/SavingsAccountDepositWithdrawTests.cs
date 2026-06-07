@@ -91,11 +91,11 @@ public sealed class SavingsAccountDepositWithdrawTests
         ((int)SavingsTransactionType.InterestPosting).Should().Be(3);
 
         var deposit = SavingsAccountTransaction.Create(
-            Guid.NewGuid(), SavingsTransactionType.Deposit, new DateOnly(2026, 1, 5), 100m);
+            Guid.NewGuid(), SavingsTransactionType.Deposit, new DateOnly(2026, 1, 5), 100m, 1);
         var withdrawal = SavingsAccountTransaction.Create(
-            Guid.NewGuid(), SavingsTransactionType.Withdrawal, new DateOnly(2026, 1, 6), 40m);
+            Guid.NewGuid(), SavingsTransactionType.Withdrawal, new DateOnly(2026, 1, 6), 40m, 2);
         var interest = SavingsAccountTransaction.Create(
-            Guid.NewGuid(), SavingsTransactionType.InterestPosting, new DateOnly(2026, 1, 31), 1.25m);
+            Guid.NewGuid(), SavingsTransactionType.InterestPosting, new DateOnly(2026, 1, 31), 1.25m, 3);
 
         deposit.IsCredit.Should().BeTrue();
         withdrawal.IsCredit.Should().BeFalse();
