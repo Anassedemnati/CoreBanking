@@ -126,7 +126,9 @@ public sealed class SavingsAccountDepositWithdrawTests
         var txId = a.WithdrawMoney(new DateOnly(2026, 1, 20), 400m, Today);
 
         a.AccountBalance.Should().Be(600m);
-        a.Transactions.Should().Contain(t => t.Id == txId && t.Type == SavingsTransactionType.Withdrawal);
+        a.Transactions.Should().Contain(t =>
+            t.Id == txId && t.Type == SavingsTransactionType.Withdrawal &&
+            t.Amount == 400m && t.RunningBalance == 600m);
         a.DomainEvents.OfType<SavingsWithdrawn>().Should().ContainSingle()
             .Which.BalanceAfter.Should().Be(600m);
     }
@@ -155,5 +157,18 @@ public sealed class SavingsAccountDepositWithdrawTests
         var act = () => a.WithdrawMoney(new DateOnly(2026, 2, 1), 500m, Today);
 
         act.Should().Throw<DomainException>().Which.Code.Should().Be("account.balance.insufficient");
+        a.AccountBalance.Should().Be(1100m);
+        a.Transactions.Should().HaveCount(2);
+    }
+
+    [Fact]
+    public void WithdrawMoney_on_zero_balance_account_throws_insufficient()
+    {
+        var a = MakeActive();
+
+        var act = () => a.WithdrawMoney(new DateOnly(2026, 1, 10), 1m, Today);
+
+        act.Should().Throw<DomainException>().Which.Code.Should().Be("account.balance.insufficient");
+        a.Transactions.Should().BeEmpty();
     }
 }
