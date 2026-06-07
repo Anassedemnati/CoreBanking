@@ -11,6 +11,7 @@ public sealed class SavingsAccountsWriteDbContext(DbContextOptions<SavingsAccoun
     : DbContext(options), IOutboxDbContext
 {
     public DbSet<SavingsAccount> SavingsAccounts => Set<SavingsAccount>();
+    public DbSet<SavingsAccountTransaction> SavingsTransactions => Set<SavingsAccountTransaction>();
     public DbSet<OutboxMessage> Outbox => Set<OutboxMessage>();
     public DbSet<ClientRef> ClientRefs => Set<ClientRef>();
     public DbSet<ProductRef> ProductRefs => Set<ProductRef>();
@@ -19,6 +20,7 @@ public sealed class SavingsAccountsWriteDbContext(DbContextOptions<SavingsAccoun
     {
         modelBuilder.HasDefaultSchema("SAVINGS");
         modelBuilder.ApplyConfiguration(new SavingsAccountConfiguration());
+        modelBuilder.ApplyConfiguration(new SavingsAccountTransactionConfiguration());
         modelBuilder.ApplyConfiguration(new ClientRefConfiguration());
         modelBuilder.ApplyConfiguration(new ProductRefConfiguration());
         modelBuilder.Entity<OutboxMessage>(e =>
