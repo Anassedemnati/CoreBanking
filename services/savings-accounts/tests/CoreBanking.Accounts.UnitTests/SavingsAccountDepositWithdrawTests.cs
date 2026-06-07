@@ -25,4 +25,18 @@ public sealed class SavingsAccountDepositWithdrawTests
         interest.IsCredit.Should().BeTrue();
         deposit.Id.Should().NotBe(Guid.Empty);
     }
+
+    [Fact]
+    public void SubmitApplication_snapshots_interest_settings_with_defaults()
+    {
+        var account = SavingsAccount.SubmitApplication(
+            Guid.NewGuid(), Guid.NewGuid(), "SA-0002", "USD", 2, 5.0m, new DateOnly(2026, 6, 6));
+
+        account.Compounding.Should().Be(InterestCompoundingPeriod.Monthly);
+        account.PostingPeriod.Should().Be(InterestPostingPeriod.Monthly);
+        account.DaysInYear.Should().Be(DaysInYearType.Days365);
+        account.AccountBalance.Should().Be(0m);
+        account.InterestPostedTillDate.Should().BeNull();
+        account.Transactions.Should().BeEmpty();
+    }
 }

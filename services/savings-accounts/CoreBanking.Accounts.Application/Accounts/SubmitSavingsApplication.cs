@@ -13,7 +13,10 @@ public sealed record SubmitSavingsApplicationCommand(
     string CurrencyCode,
     int CurrencyDecimalPlaces,
     decimal NominalAnnualRate,
-    DateOnly SubmittedOn) : ICommand<Guid>;
+    DateOnly SubmittedOn,
+    InterestCompoundingPeriod Compounding = InterestCompoundingPeriod.Monthly,
+    InterestPostingPeriod PostingPeriod = InterestPostingPeriod.Monthly,
+    DaysInYearType DaysInYear = DaysInYearType.Days365) : ICommand<Guid>;
 
 public sealed class SubmitSavingsApplicationValidator : AbstractValidator<SubmitSavingsApplicationCommand>
 {
@@ -24,6 +27,9 @@ public sealed class SubmitSavingsApplicationValidator : AbstractValidator<Submit
         RuleFor(x => x.AccountNo).NotEmpty().MaximumLength(50);
         RuleFor(x => x.CurrencyCode).Length(3);
         RuleFor(x => x.NominalAnnualRate).GreaterThanOrEqualTo(0);
+        RuleFor(x => x.Compounding).IsInEnum();
+        RuleFor(x => x.PostingPeriod).IsInEnum();
+        RuleFor(x => x.DaysInYear).IsInEnum();
     }
 }
 
@@ -48,7 +54,8 @@ public sealed class SubmitSavingsApplicationHandler(
         var account = SavingsAccount.SubmitApplication(
             cmd.ClientId, cmd.ProductId, cmd.AccountNo,
             cmd.CurrencyCode, cmd.CurrencyDecimalPlaces,
-            cmd.NominalAnnualRate, cmd.SubmittedOn);
+            cmd.NominalAnnualRate, cmd.SubmittedOn,
+            cmd.Compounding, cmd.PostingPeriod, cmd.DaysInYear);
 
         repo.Add(account);
         await uow.SaveChangesAsync(ct);

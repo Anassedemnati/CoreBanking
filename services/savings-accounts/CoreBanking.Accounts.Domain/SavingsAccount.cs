@@ -12,6 +12,15 @@ public sealed class SavingsAccount : AggregateRoot, IAuditable
     public string CurrencyCode { get; private set; } = default!;
     public int CurrencyDecimalPlaces { get; private set; }
     public decimal NominalAnnualRate { get; private set; }
+    public decimal AccountBalance { get; private set; }
+    public InterestCompoundingPeriod Compounding { get; private set; }
+    public InterestPostingPeriod PostingPeriod { get; private set; }
+    public DaysInYearType DaysInYear { get; private set; }
+    public DateOnly? InterestPostedTillDate { get; private set; }
+
+    private readonly List<SavingsAccountTransaction> _transactions = new();
+    public IReadOnlyList<SavingsAccountTransaction> Transactions => _transactions.AsReadOnly();
+
     public DateOnly SubmittedOn { get; private set; }
     public DateOnly? ApprovedOn { get; private set; }
     public DateOnly? ActivatedOn { get; private set; }
@@ -33,7 +42,10 @@ public sealed class SavingsAccount : AggregateRoot, IAuditable
         string currencyCode,
         int currencyDecimalPlaces,
         decimal nominalAnnualRate,
-        DateOnly submittedOn)
+        DateOnly submittedOn,
+        InterestCompoundingPeriod compounding = InterestCompoundingPeriod.Monthly,
+        InterestPostingPeriod postingPeriod = InterestPostingPeriod.Monthly,
+        DaysInYearType daysInYear = DaysInYearType.Days365)
     {
         if (string.IsNullOrWhiteSpace(accountNo))
             throw new DomainException("account.no.required", "Account number is required.");
@@ -47,7 +59,10 @@ public sealed class SavingsAccount : AggregateRoot, IAuditable
             CurrencyDecimalPlaces = currencyDecimalPlaces,
             NominalAnnualRate = nominalAnnualRate,
             SubmittedOn = submittedOn,
-            Status = SavingsAccountStatus.Submitted
+            Status = SavingsAccountStatus.Submitted,
+            Compounding = compounding,
+            PostingPeriod = postingPeriod,
+            DaysInYear = daysInYear
         };
         a.Raise(new SavingsAccountSubmitted(a.Id, clientId, productId));
         return a;
