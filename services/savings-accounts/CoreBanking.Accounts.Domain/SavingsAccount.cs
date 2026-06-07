@@ -27,6 +27,7 @@ public sealed class SavingsAccount : AggregateRoot, IAuditable
     public DateOnly? ActivatedOn { get; private set; }
     public DateOnly? RejectedOn { get; private set; }
     public DateOnly? WithdrawnOn { get; private set; }
+    public DateOnly? ClosedOn { get; private set; }
 
     // IAuditable
     public DateTimeOffset CreatedOnUtc { get; set; }
@@ -163,6 +164,37 @@ public sealed class SavingsAccount : AggregateRoot, IAuditable
             }
             InterestPostedTillDate = periodEnd;
         }
+    }
+
+    public void Close(DateOnly closedOn, bool withdrawBalance, DateOnly today)
+    {
+        if (Status != SavingsAccountStatus.Active)
+            throw new DomainException("account.close.notactive",
+                $"Cannot close an account in {Status} status.");
+        if (closedOn < ActivatedOn!.Value)
+            throw new DomainException("account.close.beforeactivation",
+                "Close date cannot be before the account's activation date.");
+        if (closedOn > today)
+            throw new DomainException("account.close.future",
+                "Close date cannot be in the future.");
+        if (_transactions.Count > 0)
+        {
+            var lastTransactionDate = _transactions.Max(t => t.TransactionDate);
+            if (closedOn < lastTransactionDate)
+                throw new DomainException("account.close.afterlasttransaction",
+                    "Close date cannot be before the last transaction date.");
+        }
+
+        // Slice 2 (Task 2) fills in the pivot-exempt settle here:
+        // if (withdrawBalance && AccountBalance > 0m) InsertWithdrawalUnchecked(closedOn, AccountBalance);
+
+        if (AccountBalance != 0m)
+            throw new DomainException("account.close.balance.nonzero",
+                "Account balance must be zero to close. Sweep funds or pass withdrawBalance=true.");
+
+        Status = SavingsAccountStatus.Closed;
+        ClosedOn = closedOn;
+        Raise(new SavingsAccountClosed(Id, closedOn, AccountBalance));
     }
 
     private void EnsureTransactionAllowed(DateOnly on, DateOnly today)
