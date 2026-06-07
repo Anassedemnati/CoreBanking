@@ -62,7 +62,8 @@ public sealed class SavingsAccount : AggregateRoot, IAuditable
             Status = SavingsAccountStatus.Submitted,
             Compounding = compounding,
             PostingPeriod = postingPeriod,
-            DaysInYear = daysInYear
+            DaysInYear = daysInYear,
+            AccountBalance = 0m,
         };
         a.Raise(new SavingsAccountSubmitted(a.Id, clientId, productId));
         return a;
@@ -98,6 +99,57 @@ public sealed class SavingsAccount : AggregateRoot, IAuditable
         Status = SavingsAccountStatus.Withdrawn;
         WithdrawnOn = on;
         Raise(new SavingsAccountWithdrawn(Id, on));
+    }
+
+    public Guid Deposit(DateOnly on, decimal amount, DateOnly today)
+    {
+        EnsureTransactionAllowed(on, today);
+        EnsurePositive(amount);
+        var tx = AddTransaction(SavingsTransactionType.Deposit, on, amount);
+        Raise(new SavingsDeposited(Id, tx.Id, on, amount, AccountBalance));
+        return tx.Id;
+    }
+
+    private void EnsureTransactionAllowed(DateOnly on, DateOnly today)
+    {
+        if (Status != SavingsAccountStatus.Active)
+            throw new DomainException("account.transaction.notactive",
+                $"Transactions are not allowed on an account in {Status} status.");
+        if (on > today)
+            throw new DomainException("account.transaction.future",
+                "Transaction date cannot be in the future.");
+        if (on < ActivatedOn!.Value)
+            throw new DomainException("account.transaction.beforeactivation",
+                "Transaction date cannot be before the account's activation date.");
+        if (InterestPostedTillDate is { } pivot && on <= pivot)
+            throw new DomainException("account.transaction.beforepivot",
+                $"Transaction date cannot be on or before the interest posting pivot date {pivot:yyyy-MM-dd}.");
+    }
+
+    private static void EnsurePositive(decimal amount)
+    {
+        if (amount <= 0m)
+            throw new DomainException("account.transaction.amount.invalid",
+                "Amount must be greater than zero.");
+    }
+
+    private SavingsAccountTransaction AddTransaction(SavingsTransactionType type, DateOnly on, decimal amount)
+    {
+        var tx = SavingsAccountTransaction.Create(Id, type, on, amount);
+        _transactions.Add(tx);
+        RebuildRunningBalances();
+        return tx;
+    }
+
+    private void RebuildRunningBalances()
+    {
+        decimal balance = 0m;
+        foreach (var t in _transactions.OrderBy(x => x.TransactionDate).ThenBy(x => x.Id))
+        {
+            balance += t.IsCredit ? t.Amount : -t.Amount;
+            t.RunningBalance = balance;
+        }
+        AccountBalance = balance;
     }
 
     private void Require(SavingsAccountStatus expected, string action)
