@@ -142,11 +142,37 @@ public sealed class SavingsAccountCloseTests
         a.InterestPostedTillDate.Should().Be(new DateOnly(2026, 1, 31));
         a.ClearDomainEvents();
 
-        // closedOn == lastTxnDate (Jan 31) == pivot. Public WithdrawMoney would throw
-        // account.transaction.beforepivot; the internal settle is pivot-exempt.
+        // Contrast (load-bearing): the PUBLIC WithdrawMoney on the same pivot date is
+        // STILL rejected by EnsureTransactionAllowed's pivot guard. This proves the
+        // close-settle exemption is a genuine exemption, not an absent guard — without
+        // this assertion the success-only test below would pass even if the pivot guard
+        // were deleted entirely.
+        a.Invoking(x => x.WithdrawMoney(new DateOnly(2026, 1, 31), 1004.25m, Today))
+            .Should().Throw<DomainException>().Which.Code.Should().Be("account.transaction.beforepivot");
+
+        // closedOn == lastTxnDate (Jan 31) == pivot. The internal settle is pivot-exempt.
         a.Close(new DateOnly(2026, 1, 31), withdrawBalance: true, Today);
 
         a.AccountBalance.Should().Be(0m);
         a.Status.Should().Be(SavingsAccountStatus.Closed);
+    }
+
+    [Fact] // Edge: withdrawBalance:true on an already-zero account is a no-op (no spurious transaction)
+    public void Close_with_sweep_on_zero_balance_adds_no_withdrawal()
+    {
+        var a = MakeActive();
+        a.Deposit(new DateOnly(2026, 1, 10), 1000m, Today);
+        a.WithdrawMoney(new DateOnly(2026, 2, 1), 1000m, Today);   // balance 0, last txn Feb 1
+        a.ClearDomainEvents();
+        var txCountBefore = a.Transactions.Count;
+
+        a.Close(new DateOnly(2026, 2, 1), withdrawBalance: true, Today);
+
+        a.Status.Should().Be(SavingsAccountStatus.Closed);
+        a.AccountBalance.Should().Be(0m);
+        a.Transactions.Should().HaveCount(txCountBefore);                 // AccountBalance > 0 guard => no sweep
+        a.DomainEvents.OfType<SavingsWithdrawn>().Should().BeEmpty();
+        a.DomainEvents.OfType<SavingsAccountClosed>().Should().ContainSingle()
+            .Which.BalanceAfter.Should().Be(0m);
     }
 }
