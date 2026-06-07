@@ -269,7 +269,10 @@ public sealed class SavingsAccountsController(IMediator mediator) : ControllerBa
     /// <param name="ct">Cancellation token.</param>
     /// <response code="204">Interest posted (or no completed period was pending).</response>
     /// <response code="404">No savings account found with the given <c>id</c>.</response>
-    /// <response code="422">Account is not active (<c>account.postinterest.notactive</c>).</response>
+    /// <response code="422">
+    /// Account is not active (<c>account.postinterest.notactive</c>) or the posting date
+    /// is in the future (<c>account.postinterest.future</c>).
+    /// </response>
     [HttpPost("{id:guid}/postinterest")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
