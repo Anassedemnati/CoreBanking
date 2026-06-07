@@ -23,6 +23,13 @@ The savings-creation slice decomposes into three bounded contexts:
 - **Savings Products Service** — product catalogue (`m_savings_product`).
 - **Savings Accounts Service** — the account lifecycle (`m_savings_account`): submit → approve → activate, plus reject & withdraw.
 
+> **Implemented (June 2026): savings transactions + interest posting engine**, ported from Fineract's savings module:
+> - Transaction types with Fineract ids — deposit (1), withdrawal (2), interest posting (3) — on a running-balance timeline; withdrawals are validated against the **full timeline** (the balance may never go negative at any point, including for backdated entries).
+> - Interest on the **daily-balance** method: daily or monthly compounding, calendar posting periods (monthly/quarterly/biannual/annual), 360/365 day-count, `AwayFromZero` rounding applied only at posting time.
+> - **Forward-only posting** with an `InterestPostedTillDate` pivot: posted periods are immutable; transactions dated on/before the pivot are rejected (`account.transaction.beforepivot`).
+> - Endpoints: `POST {id}/transactions/deposit`, `POST {id}/transactions/withdraw`, `POST {id}/postinterest`, `GET {id}/transactions`.
+> - Integration events `SavingsDeposited` / `SavingsWithdrawn` / `SavingsInterestPosted` published to `savings-accounts.events` via the outbox.
+
 They sit behind an **API Gateway (YARP)** and communicate **hybrid-style**: asynchronous **integration events over Apache Kafka** (with a per-service transactional **outbox**) keep **local read-model copies** of the Client/Product reference data inside the Savings Accounts service, so opening an account validates against that service's **own** store — autonomous and resilient. Because the reference topics are **log-compacted**, a read model can be rebuilt at any time by replaying the log. A synchronous fallback is used only where strong consistency is required.
 
 Each service **owns its data** as a dedicated **Oracle schema**; for resource sanity in dev they share one Oracle instance, with the read/write split (write→primary, read→standby) applied per service.

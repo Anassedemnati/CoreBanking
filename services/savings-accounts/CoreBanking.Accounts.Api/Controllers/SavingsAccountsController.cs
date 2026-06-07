@@ -29,6 +29,10 @@ namespace CoreBanking.Accounts.Api.Controllers;
 ///
 /// All other transitions return <c>422 Unprocessable Entity</c>.
 ///
+/// Once <c>Active</c>, the account accepts deposit/withdrawal transactions and
+/// interest posting (see the transaction endpoints below). Money can never make
+/// the balance negative; backdated entries are allowed back to the interest pivot date.
+///
 /// The client and product referenced in the submit request are validated against local
 /// read models (CLIENT_REF, PRODUCT_REF) that are kept up-to-date via Kafka consumers
 /// subscribed to the <c>clients.events</c> and <c>products.events</c> compacted topics.
