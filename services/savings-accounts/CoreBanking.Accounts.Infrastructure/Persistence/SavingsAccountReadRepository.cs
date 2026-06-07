@@ -25,7 +25,8 @@ public sealed class SavingsAccountReadRepository(SavingsAccountsReadDbContext db
                 a.RejectedOn,
                 a.WithdrawnOn,
                 a.AccountBalance,
-                a.InterestPostedTillDate))
+                a.InterestPostedTillDate,
+                a.ClosedOn))
             .FirstOrDefaultAsync(ct);
     }
 

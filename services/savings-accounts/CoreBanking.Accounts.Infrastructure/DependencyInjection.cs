@@ -82,6 +82,9 @@ public static class DependencyInjection
             SavingsInterestPosted e => new SavingsInterestPostedIntegrationEvent(
                 Guid.CreateVersion7(), DateTimeOffset.UtcNow, 1,
                 e.AccountId, e.TransactionId, e.PostedThrough, e.Amount, e.BalanceAfter),
+            SavingsAccountClosed e => new SavingsAccountClosedIntegrationEvent(
+                Guid.CreateVersion7(), DateTimeOffset.UtcNow, 1,
+                e.AccountId, e.ClosedOn, e.BalanceAfter),
             _ => null
         };
 }
