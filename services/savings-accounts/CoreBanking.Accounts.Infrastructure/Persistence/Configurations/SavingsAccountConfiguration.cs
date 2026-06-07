@@ -24,6 +24,7 @@ public sealed class SavingsAccountConfiguration : IEntityTypeConfiguration<Savin
         b.Property(x => x.ActivatedOn).HasColumnName("ACTIVATEDON");
         b.Property(x => x.RejectedOn).HasColumnName("REJECTEDON");
         b.Property(x => x.WithdrawnOn).HasColumnName("WITHDRAWNON");
+        b.Property(x => x.ClosedOn).HasColumnName("CLOSEDON");
         b.Property(x => x.AccountBalance).HasColumnName("ACCOUNTBALANCE").HasColumnType("NUMBER(19,6)");
         b.Property(x => x.Compounding).HasColumnName("COMPOUNDINGENUM").HasConversion<int>();
         b.Property(x => x.PostingPeriod).HasColumnName("POSTINGPERIODENUM").HasConversion<int>();
