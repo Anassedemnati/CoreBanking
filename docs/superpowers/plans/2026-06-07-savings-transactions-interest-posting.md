@@ -181,7 +181,7 @@ SavingsAccount.PostInterest()      → SavingsInterestPosted  ┘
 
 ### Task 0: Branch
 
-- [ ] **Step 1: Create a feature branch**
+- [x] **Step 1: Create a feature branch**
 
 ```bash
 git checkout -b feature/savings-transactions-interest
@@ -197,7 +197,7 @@ git checkout -b feature/savings-transactions-interest
 - Create: `services/savings-accounts/CoreBanking.Accounts.Domain/SavingsAccountTransaction.cs`
 - Test: `services/savings-accounts/tests/CoreBanking.Accounts.UnitTests/SavingsAccountDepositWithdrawTests.cs`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```csharp
 using CoreBanking.Accounts.Domain;
@@ -230,12 +230,12 @@ public sealed class SavingsAccountDepositWithdrawTests
 }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `dotnet test services/savings-accounts/tests/CoreBanking.Accounts.UnitTests --filter "FullyQualifiedName~SavingsAccountDepositWithdrawTests"`
 Expected: FAIL (compile error: `SavingsTransactionType` not defined)
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 `SavingsTransactionType.cs`:
 ```csharp
@@ -316,12 +316,12 @@ The test calls `Create` from the test assembly — add `InternalsVisibleTo` to t
 </ItemGroup>
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `dotnet test services/savings-accounts/tests/CoreBanking.Accounts.UnitTests --filter "FullyQualifiedName~SavingsAccountDepositWithdrawTests"`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add services/savings-accounts
@@ -336,7 +336,7 @@ git commit -m "feat(accounts): add savings transaction entity and interest enums
 - Modify: `services/savings-accounts/CoreBanking.Accounts.Domain/SavingsAccount.cs`
 - Modify: `services/savings-accounts/CoreBanking.Accounts.Application/Accounts/SubmitSavingsApplication.cs`
 
-- [ ] **Step 1: Write the failing test** (append to `SavingsAccountDepositWithdrawTests.cs`)
+- [x] **Step 1: Write the failing test** (append to `SavingsAccountDepositWithdrawTests.cs`)
 
 ```csharp
     [Fact]
@@ -354,12 +354,12 @@ git commit -m "feat(accounts): add savings transaction entity and interest enums
     }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `dotnet test services/savings-accounts/tests/CoreBanking.Accounts.UnitTests --filter "FullyQualifiedName~SubmitApplication_snapshots_interest_settings"`
 Expected: FAIL (compile error: `Compounding` not defined)
 
-- [ ] **Step 3: Extend the aggregate** — in `SavingsAccount.cs`, add properties after `NominalAnnualRate`:
+- [x] **Step 3: Extend the aggregate** — in `SavingsAccount.cs`, add properties after `NominalAnnualRate`:
 
 ```csharp
     public decimal AccountBalance { get; private set; }
@@ -398,7 +398,7 @@ and inside the object initializer (after `Status = SavingsAccountStatus.Submitte
 
 Optional parameters keep `SavingsAccountTests.MakeSubmitted()` and the existing handler compiling unchanged.
 
-- [ ] **Step 4: Thread settings through the command** — in `SubmitSavingsApplication.cs`:
+- [x] **Step 4: Thread settings through the command** — in `SubmitSavingsApplication.cs`:
 
 Replace the command record with:
 
@@ -434,12 +434,12 @@ In the handler, pass them to the factory:
             cmd.Compounding, cmd.PostingPeriod, cmd.DaysInYear);
 ```
 
-- [ ] **Step 5: Run the full unit test project (old + new tests)**
+- [x] **Step 5: Run the full unit test project (old + new tests)**
 
 Run: `dotnet test services/savings-accounts/tests/CoreBanking.Accounts.UnitTests`
 Expected: PASS (all existing lifecycle tests still green)
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add services/savings-accounts
@@ -455,7 +455,7 @@ git commit -m "feat(accounts): snapshot interest settings on savings account at 
 - Modify: `services/savings-accounts/CoreBanking.Accounts.Domain/Events/SavingsAccountEvents.cs`
 - Test: `services/savings-accounts/tests/CoreBanking.Accounts.UnitTests/SavingsAccountDepositWithdrawTests.cs`
 
-- [ ] **Step 1: Write the failing tests** (append; also add `using CoreBanking.Accounts.Domain.Events;` and `using CoreBanking.BuildingBlocks.Domain;` at top, plus the shared helper)
+- [x] **Step 1: Write the failing tests** (append; also add `using CoreBanking.Accounts.Domain.Events;` and `using CoreBanking.BuildingBlocks.Domain;` at top, plus the shared helper)
 
 ```csharp
     private static readonly DateOnly Today = new(2026, 6, 7);
@@ -536,12 +536,12 @@ git commit -m "feat(accounts): snapshot interest settings on savings account at 
 
 Note: `DomainException` (verified in `shared/CoreBanking.BuildingBlocks.Domain/Exceptions/DomainException.cs`) is `DomainException(string code, string message)` and exposes `public string Code { get; }` — the `.Which.Code` assertions below compile as written.
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `dotnet test services/savings-accounts/tests/CoreBanking.Accounts.UnitTests --filter "FullyQualifiedName~SavingsAccountDepositWithdrawTests"`
 Expected: FAIL (compile error: `Deposit` not defined)
 
-- [ ] **Step 3: Implement** — add to `SavingsAccountEvents.cs`:
+- [x] **Step 3: Implement** — add to `SavingsAccountEvents.cs`:
 
 ```csharp
 public sealed record SavingsDeposited(Guid AccountId, Guid TransactionId, DateOnly On, decimal Amount, decimal BalanceAfter) : IDomainEvent;
@@ -606,12 +606,12 @@ Add to `SavingsAccount.cs` (after `Withdraw`, before `Require`):
 
 Add `using System.Linq;` is implicit (.NET 10 ImplicitUsings); no extra usings needed beyond the existing ones.
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `dotnet test services/savings-accounts/tests/CoreBanking.Accounts.UnitTests --filter "FullyQualifiedName~SavingsAccountDepositWithdrawTests"`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add services/savings-accounts
@@ -626,7 +626,7 @@ git commit -m "feat(accounts): deposit with timeline running-balance recomputati
 - Modify: `services/savings-accounts/CoreBanking.Accounts.Domain/SavingsAccount.cs`
 - Test: `services/savings-accounts/tests/CoreBanking.Accounts.UnitTests/SavingsAccountDepositWithdrawTests.cs`
 
-- [ ] **Step 1: Write the failing tests** (append)
+- [x] **Step 1: Write the failing tests** (append)
 
 ```csharp
     [Fact]
@@ -670,12 +670,12 @@ git commit -m "feat(accounts): deposit with timeline running-balance recomputati
     }
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `dotnet test services/savings-accounts/tests/CoreBanking.Accounts.UnitTests --filter "FullyQualifiedName~WithdrawMoney"`
 Expected: FAIL (compile error: `WithdrawMoney` not defined)
 
-- [ ] **Step 3: Implement** — add to `SavingsAccount.cs` after `Deposit`:
+- [x] **Step 3: Implement** — add to `SavingsAccount.cs` after `Deposit`:
 
 ```csharp
     public Guid WithdrawMoney(DateOnly on, decimal amount, DateOnly today)
@@ -703,12 +703,12 @@ Expected: FAIL (compile error: `WithdrawMoney` not defined)
     }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `dotnet test services/savings-accounts/tests/CoreBanking.Accounts.UnitTests --filter "FullyQualifiedName~SavingsAccountDepositWithdrawTests"`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add services/savings-accounts
@@ -723,7 +723,7 @@ git commit -m "feat(accounts): withdrawal with full-timeline balance sufficiency
 - Create: `services/savings-accounts/CoreBanking.Accounts.Domain/Interest/PostingPeriodCalculator.cs`
 - Test: `services/savings-accounts/tests/CoreBanking.Accounts.UnitTests/Interest/PostingPeriodCalculatorTests.cs`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```csharp
 using CoreBanking.Accounts.Domain;
@@ -787,12 +787,12 @@ public sealed class PostingPeriodCalculatorTests
 }
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `dotnet test services/savings-accounts/tests/CoreBanking.Accounts.UnitTests --filter "FullyQualifiedName~PostingPeriodCalculatorTests"`
 Expected: FAIL (compile error: namespace `Interest` not found)
 
-- [ ] **Step 3: Implement** — `PostingPeriodCalculator.cs`:
+- [x] **Step 3: Implement** — `PostingPeriodCalculator.cs`:
 
 ```csharp
 namespace CoreBanking.Accounts.Domain.Interest;
@@ -834,12 +834,12 @@ public static class PostingPeriodCalculator
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `dotnet test services/savings-accounts/tests/CoreBanking.Accounts.UnitTests --filter "FullyQualifiedName~PostingPeriodCalculatorTests"`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add services/savings-accounts
@@ -855,7 +855,7 @@ git commit -m "feat(accounts): calendar posting period calculator"
 - Create: `services/savings-accounts/CoreBanking.Accounts.Domain/Interest/InterestCalculator.cs`
 - Test: `services/savings-accounts/tests/CoreBanking.Accounts.UnitTests/Interest/InterestCalculatorTests.cs`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```csharp
 using CoreBanking.Accounts.Domain;
@@ -945,12 +945,12 @@ public sealed class InterestCalculatorTests
 }
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `dotnet test services/savings-accounts/tests/CoreBanking.Accounts.UnitTests --filter "FullyQualifiedName~InterestCalculatorTests"`
 Expected: FAIL (compile error: `DailyBalanceSpan` not found)
 
-- [ ] **Step 3: Implement** — `InterestEngine.cs`:
+- [x] **Step 3: Implement** — `InterestEngine.cs`:
 
 ```csharp
 namespace CoreBanking.Accounts.Domain.Interest;
@@ -1064,12 +1064,12 @@ public static class InterestCalculator
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `dotnet test services/savings-accounts/tests/CoreBanking.Accounts.UnitTests --filter "FullyQualifiedName~InterestCalculatorTests"`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add services/savings-accounts
@@ -1084,7 +1084,7 @@ git commit -m "feat(accounts): daily-balance interest engine (monthly + daily co
 - Modify: `services/savings-accounts/CoreBanking.Accounts.Domain/SavingsAccount.cs`
 - Test: `services/savings-accounts/tests/CoreBanking.Accounts.UnitTests/SavingsAccountPostInterestTests.cs`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```csharp
 using CoreBanking.Accounts.Domain;
@@ -1189,12 +1189,12 @@ public sealed class SavingsAccountPostInterestTests
 }
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `dotnet test services/savings-accounts/tests/CoreBanking.Accounts.UnitTests --filter "FullyQualifiedName~SavingsAccountPostInterestTests"`
 Expected: FAIL (compile error: `PostInterest` not defined)
 
-- [ ] **Step 3: Implement** — add to `SavingsAccount.cs` (also add `using CoreBanking.Accounts.Domain.Interest;` at the top):
+- [x] **Step 3: Implement** — add to `SavingsAccount.cs` (also add `using CoreBanking.Accounts.Domain.Interest;` at the top):
 
 ```csharp
     public void PostInterest(DateOnly asOf, DateOnly today)
@@ -1228,12 +1228,12 @@ Expected: FAIL (compile error: `PostInterest` not defined)
     }
 ```
 
-- [ ] **Step 4: Run the full unit test project**
+- [x] **Step 4: Run the full unit test project**
 
 Run: `dotnet test services/savings-accounts/tests/CoreBanking.Accounts.UnitTests`
 Expected: PASS (all)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add services/savings-accounts
@@ -1249,7 +1249,7 @@ git commit -m "feat(accounts): sequential interest posting with pivot date"
 - Create: `services/savings-accounts/CoreBanking.Accounts.Application/Accounts/WithdrawFromSavingsAccount.cs`
 - Test: `services/savings-accounts/tests/CoreBanking.Accounts.UnitTests/Handlers/DepositToSavingsAccountHandlerTests.cs`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```csharp
 using CoreBanking.Accounts.Application.Abstractions;
@@ -1319,12 +1319,12 @@ public sealed class DepositToSavingsAccountHandlerTests
 
 Note: `IDateTimeProvider` lives in `CoreBanking.BuildingBlocks.Application/Abstractions/IDateTimeProvider.cs` and exposes `DateTimeOffset UtcNow { get; }`. Check the namespace used by its file and adjust the `using` if it is `CoreBanking.BuildingBlocks.Application.Abstractions`.
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `dotnet test services/savings-accounts/tests/CoreBanking.Accounts.UnitTests --filter "FullyQualifiedName~DepositToSavingsAccountHandlerTests"`
 Expected: FAIL (compile error: `DepositToSavingsAccountCommand` not defined)
 
-- [ ] **Step 3: Implement** — `DepositToSavingsAccount.cs`:
+- [x] **Step 3: Implement** — `DepositToSavingsAccount.cs`:
 
 ```csharp
 using CoreBanking.Accounts.Application.Abstractions;
@@ -1418,12 +1418,12 @@ public sealed class WithdrawFromSavingsAccountHandler(
 
 If `IDateTimeProvider`'s namespace or the `ICommand`/`ICommandHandler` usings differ, mirror the usings of `SubmitSavingsApplication.cs` in the same folder.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `dotnet test services/savings-accounts/tests/CoreBanking.Accounts.UnitTests --filter "FullyQualifiedName~DepositToSavingsAccountHandlerTests"`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add services/savings-accounts
@@ -1440,7 +1440,7 @@ git commit -m "feat(accounts): deposit and withdraw application commands"
 - Modify: `services/savings-accounts/CoreBanking.Accounts.Application/Accounts/SavingsAccountDto.cs`
 - Modify: `services/savings-accounts/CoreBanking.Accounts.Application/Abstractions/ISavingsAccountReadRepository.cs`
 
-- [ ] **Step 1: Implement post-interest command** — `PostInterestToSavingsAccount.cs`:
+- [x] **Step 1: Implement post-interest command** — `PostInterestToSavingsAccount.cs`:
 
 ```csharp
 using CoreBanking.Accounts.Application.Abstractions;
@@ -1484,7 +1484,7 @@ public sealed class PostInterestToSavingsAccountHandler(
 }
 ```
 
-- [ ] **Step 2: Implement transactions query** — `GetSavingsAccountTransactions.cs`:
+- [x] **Step 2: Implement transactions query** — `GetSavingsAccountTransactions.cs`:
 
 ```csharp
 using CoreBanking.Accounts.Application.Abstractions;
@@ -1514,13 +1514,13 @@ public sealed class GetSavingsAccountTransactionsHandler(ISavingsAccountReadRepo
 }
 ```
 
-- [ ] **Step 3: Extend read repository abstraction** — in `ISavingsAccountReadRepository.cs` add to the interface:
+- [x] **Step 3: Extend read repository abstraction** — in `ISavingsAccountReadRepository.cs` add to the interface:
 
 ```csharp
     Task<IReadOnlyList<SavingsTransactionDto>> FindTransactionsAsync(Guid accountId, CancellationToken ct = default);
 ```
 
-- [ ] **Step 4: Extend the DTO** — replace `SavingsAccountDto.cs` record with:
+- [x] **Step 4: Extend the DTO** — replace `SavingsAccountDto.cs` record with:
 
 ```csharp
 namespace CoreBanking.Accounts.Application.Accounts;
@@ -1542,12 +1542,12 @@ public sealed record SavingsAccountDto(
     DateOnly? InterestPostedTillDate);
 ```
 
-- [ ] **Step 5: Build to verify compile errors are only in Infrastructure** (read repo projection — fixed next task)
+- [x] **Step 5: Build to verify compile errors are only in Infrastructure** (read repo projection — fixed next task)
 
 Run: `dotnet build services/savings-accounts/CoreBanking.Accounts.Application`
 Expected: PASS (Application layer compiles; Infrastructure intentionally not built yet)
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add services/savings-accounts
@@ -1566,7 +1566,7 @@ git commit -m "feat(accounts): post-interest command, transactions query, balanc
 - Modify: `services/savings-accounts/CoreBanking.Accounts.Infrastructure/Persistence/SavingsAccountRepository.cs`
 - Modify: `services/savings-accounts/CoreBanking.Accounts.Infrastructure/Persistence/SavingsAccountReadRepository.cs`
 
-- [ ] **Step 1: Transaction entity configuration** — `SavingsAccountTransactionConfiguration.cs`:
+- [x] **Step 1: Transaction entity configuration** — `SavingsAccountTransactionConfiguration.cs`:
 
 ```csharp
 using CoreBanking.Accounts.Domain;
@@ -1592,7 +1592,7 @@ public sealed class SavingsAccountTransactionConfiguration : IEntityTypeConfigur
 }
 ```
 
-- [ ] **Step 2: Extend account configuration** — in `SavingsAccountConfiguration.cs`, add before the `Version` line:
+- [x] **Step 2: Extend account configuration** — in `SavingsAccountConfiguration.cs`, add before the `Version` line:
 
 ```csharp
         b.Property(x => x.AccountBalance).HasColumnName("ACCOUNTBALANCE").HasColumnType("NUMBER(19,6)");
@@ -1611,7 +1611,7 @@ public sealed class SavingsAccountTransactionConfiguration : IEntityTypeConfigur
 
 (EF finds the `_transactions` backing field by convention.)
 
-- [ ] **Step 3: Register in both DbContexts** — in `SavingsAccountsWriteDbContext.cs` add after `SavingsAccounts`:
+- [x] **Step 3: Register in both DbContexts** — in `SavingsAccountsWriteDbContext.cs` add after `SavingsAccounts`:
 
 ```csharp
     public DbSet<SavingsAccountTransaction> SavingsTransactions => Set<SavingsAccountTransaction>();
@@ -1625,7 +1625,7 @@ and inside `OnModelCreating` after the `SavingsAccountConfiguration` line:
 
 Make the same two additions in `SavingsAccountsReadDbContext.cs` (mirror its existing structure).
 
-- [ ] **Step 4: Repository loads transactions** — replace `FindAsync` in `SavingsAccountRepository.cs`:
+- [x] **Step 4: Repository loads transactions** — replace `FindAsync` in `SavingsAccountRepository.cs`:
 
 ```csharp
 using CoreBanking.Accounts.Application.Abstractions;
@@ -1645,7 +1645,7 @@ public sealed class SavingsAccountRepository(SavingsAccountsWriteDbContext db) :
 }
 ```
 
-- [ ] **Step 5: Read repository** — in `SavingsAccountReadRepository.cs`, extend the DTO projection (add the two new fields after `a.WithdrawnOn`):
+- [x] **Step 5: Read repository** — in `SavingsAccountReadRepository.cs`, extend the DTO projection (add the two new fields after `a.WithdrawnOn`):
 
 ```csharp
                 a.WithdrawnOn,
@@ -1671,12 +1671,12 @@ and add the transactions query method:
 
 (add `using CoreBanking.Accounts.Domain;` to the file's usings).
 
-- [ ] **Step 6: Build the whole service**
+- [x] **Step 6: Build the whole service**
 
 Run: `dotnet build services/savings-accounts/CoreBanking.Accounts.Api`
 Expected: PASS
 
-- [ ] **Step 7: Generate the migration**
+- [x] **Step 7: Generate the migration**
 
 Run:
 ```bash
@@ -1687,12 +1687,12 @@ dotnet ef migrations add AddSavingsTransactions \
 ```
 Expected: new migration under `Persistence/Migrations/` creating `SAVINGS_ACCOUNT_TRANSACTIONS` and adding the five account columns. Inspect the generated `Up()` — it must contain `CreateTable` for the transactions table and five `AddColumn` calls; no `DropTable`/`DropColumn`.
 
-- [ ] **Step 8: Run all unit tests**
+- [x] **Step 8: Run all unit tests**
 
 Run: `dotnet test services/savings-accounts/tests/CoreBanking.Accounts.UnitTests`
 Expected: PASS
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add services/savings-accounts
@@ -1707,7 +1707,7 @@ git commit -m "feat(accounts): persist savings transactions (EF mapping + migrat
 - Modify: `services/savings-accounts/CoreBanking.Accounts.Infrastructure/Events/SavingsAccountIntegrationEvents.cs`
 - Modify: `services/savings-accounts/CoreBanking.Accounts.Infrastructure/DependencyInjection.cs`
 
-- [ ] **Step 1: Add integration events** — append to `SavingsAccountIntegrationEvents.cs`:
+- [x] **Step 1: Add integration events** — append to `SavingsAccountIntegrationEvents.cs`:
 
 ```csharp
 public sealed record SavingsDepositedIntegrationEvent(
@@ -1756,7 +1756,7 @@ public sealed record SavingsInterestPostedIntegrationEvent(
 }
 ```
 
-- [ ] **Step 2: Extend the outbox map** — in `DependencyInjection.cs`, add cases to `DomainEventToIntegrationEventMap` before `_ => null`:
+- [x] **Step 2: Extend the outbox map** — in `DependencyInjection.cs`, add cases to `DomainEventToIntegrationEventMap` before `_ => null`:
 
 ```csharp
             SavingsDeposited e => new SavingsDepositedIntegrationEvent(
@@ -1770,12 +1770,12 @@ public sealed record SavingsInterestPostedIntegrationEvent(
                 e.AccountId, e.TransactionId, e.PostedThrough, e.Amount, e.BalanceAfter),
 ```
 
-- [ ] **Step 3: Build**
+- [x] **Step 3: Build**
 
 Run: `dotnet build services/savings-accounts/CoreBanking.Accounts.Api`
 Expected: PASS
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add services/savings-accounts
@@ -1789,7 +1789,7 @@ git commit -m "feat(accounts): publish transaction integration events via outbox
 **Files:**
 - Modify: `services/savings-accounts/CoreBanking.Accounts.Api/Controllers/SavingsAccountsController.cs`
 
-- [ ] **Step 1: Add endpoints** — inside the controller class, after `Withdraw`:
+- [x] **Step 1: Add endpoints** — inside the controller class, after `Withdraw`:
 
 ```csharp
     /// <summary>Deposit money into an active savings account.</summary>
@@ -1877,12 +1877,12 @@ public sealed record TransactionRequest(DateOnly TransactionDate, decimal Amount
 public sealed record PostInterestRequest(DateOnly AsOf);
 ```
 
-- [ ] **Step 2: Build**
+- [x] **Step 2: Build**
 
 Run: `dotnet build services/savings-accounts/CoreBanking.Accounts.Api`
 Expected: PASS
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add services/savings-accounts
@@ -1898,7 +1898,7 @@ git commit -m "feat(accounts): transaction and post-interest API endpoints"
 
 This is the first test in this project (the csproj already references `Testcontainers.Oracle`, `FluentAssertions`, EF Core, and both Infrastructure and Api projects).
 
-- [ ] **Step 1: Write the test**
+- [x] **Step 1: Write the test**
 
 ```csharp
 using CoreBanking.Accounts.Domain;
@@ -1969,12 +1969,12 @@ public sealed class SavingsTransactionsPersistenceTests : IAsyncLifetime
 }
 ```
 
-- [ ] **Step 2: Run the integration test** (requires Docker running)
+- [x] **Step 2: Run the integration test** (requires Docker running)
 
 Run: `dotnet test services/savings-accounts/tests/CoreBanking.Accounts.IntegrationTests`
 Expected: PASS (first run pulls the Oracle image; allow several minutes)
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add services/savings-accounts
@@ -1985,7 +1985,7 @@ git commit -m "test(accounts): oracle round-trip for savings transactions and in
 
 ### Task 14: Full verification + docs
 
-- [ ] **Step 1: Run every test suite in the solution that this change can affect**
+- [x] **Step 1: Run every test suite in the solution that this change can affect**
 
 ```bash
 dotnet build CoreBanking.slnx
@@ -1995,7 +1995,7 @@ dotnet test tests/CoreBanking.ContractTests
 ```
 Expected: all PASS. ArchTests guard the Clean Architecture dependency rule — new Domain files must not reference Application/Infrastructure (they don't: the interest engine lives in Domain and references nothing).
 
-- [ ] **Step 2: Update the controller's class-level remarks table** — in `SavingsAccountsController.cs`, the class `<remarks>` describes the state machine; append one line to the narrative after the transitions list:
+- [x] **Step 2: Update the controller's class-level remarks table** — in `SavingsAccountsController.cs`, the class `<remarks>` describes the state machine; append one line to the narrative after the transitions list:
 
 ```
 /// Once <c>Active</c>, the account accepts deposit/withdrawal transactions and
@@ -2003,9 +2003,9 @@ Expected: all PASS. ArchTests guard the Clean Architecture dependency rule — n
 /// the balance negative; backdated entries are allowed back to the interest pivot date.
 ```
 
-- [ ] **Step 3: Update IMPLEMENTATION_PLAN.md** — add a row/section noting the savings-accounts service now implements Fineract-derived transactions + interest posting (deposit, withdrawal, monthly/quarterly/biannual/annual posting, daily/monthly compounding, 360/365 day-count, forward-only pivot model).
+- [x] **Step 3: Update IMPLEMENTATION_PLAN.md** — add a row/section noting the savings-accounts service now implements Fineract-derived transactions + interest posting (deposit, withdrawal, monthly/quarterly/biannual/annual posting, daily/monthly compounding, 360/365 day-count, forward-only pivot model).
 
-- [ ] **Step 4: Final commit**
+- [x] **Step 4: Final commit**
 
 ```bash
 git add -A
