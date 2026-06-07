@@ -1,4 +1,5 @@
 using CoreBanking.Accounts.Domain.Events;
+using CoreBanking.Accounts.Domain.Interest;
 using CoreBanking.BuildingBlocks.Domain;
 
 namespace CoreBanking.Accounts.Domain;
@@ -134,6 +135,36 @@ public sealed class SavingsAccount : AggregateRoot, IAuditable
         return candidate.Id;
     }
 
+    public void PostInterest(DateOnly asOf, DateOnly today)
+    {
+        if (Status != SavingsAccountStatus.Active)
+            throw new DomainException("account.postinterest.notactive",
+                $"Cannot post interest on an account in {Status} status.");
+        if (asOf > today)
+            throw new DomainException("account.transaction.future",
+                "Interest posting date cannot be in the future.");
+
+        var start = InterestPostedTillDate?.AddDays(1) ?? ActivatedOn!.Value;
+
+        // Periods are posted SEQUENTIALLY: each period's posting transaction enters the
+        // timeline (and thus the balance) before the next period is calculated, so
+        // interest compounds across posting periods through the balance itself.
+        foreach (var (periodStart, periodEnd) in
+                 PostingPeriodCalculator.Split(start, asOf, PostingPeriod))
+        {
+            var spans = InterestEngine.BuildSpans(_transactions, periodStart, periodEnd);
+            var raw = InterestCalculator.Calculate(spans, NominalAnnualRate, DaysInYear, Compounding);
+            var amount = Math.Round(raw, CurrencyDecimalPlaces, MidpointRounding.AwayFromZero);
+
+            if (amount != 0m)
+            {
+                var tx = AddTransaction(SavingsTransactionType.InterestPosting, periodEnd, amount);
+                Raise(new SavingsInterestPosted(Id, tx.Id, periodEnd, amount, AccountBalance));
+            }
+            InterestPostedTillDate = periodEnd;
+        }
+    }
+
     private void EnsureTransactionAllowed(DateOnly on, DateOnly today)
     {
         if (Status != SavingsAccountStatus.Active)
@@ -145,6 +176,9 @@ public sealed class SavingsAccount : AggregateRoot, IAuditable
         if (on < ActivatedOn!.Value)
             throw new DomainException("account.transaction.beforeactivation",
                 "Transaction date cannot be before the account's activation date.");
+        // Strict (<=): transactions ON the pivot date are disallowed because interest
+        // has already been calculated through that date — relaxing this to < would
+        // silently corrupt posted periods.
         if (InterestPostedTillDate is { } pivot && on <= pivot)
             throw new DomainException("account.transaction.beforepivot",
                 $"Transaction date cannot be on or before the interest posting pivot date {pivot:yyyy-MM-dd}.");
