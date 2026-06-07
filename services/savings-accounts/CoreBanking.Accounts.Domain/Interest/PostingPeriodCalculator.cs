@@ -7,10 +7,11 @@ namespace CoreBanking.Accounts.Domain.Interest;
 public static class PostingPeriodCalculator
 {
     /// <summary>
-    /// Returns all complete periods between <paramref name="start"/> and
-    /// <paramref name="asOf"/>. Only periods whose end date falls on or before
+    /// Returns all complete periods starting from <paramref name="start"/> (inclusive)
+    /// through <paramref name="asOf"/>. Only periods whose end date falls on or before
     /// <paramref name="asOf"/> are included.
     /// </summary>
+    /// <remarks>Returns an empty list when <paramref name="start"/> is after <paramref name="asOf"/>.</remarks>
     public static IReadOnlyList<(DateOnly Start, DateOnly End)> Split(
         DateOnly start, DateOnly asOf, InterestPostingPeriod postingPeriod)
     {

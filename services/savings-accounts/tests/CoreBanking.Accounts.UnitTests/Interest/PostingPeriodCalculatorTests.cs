@@ -56,4 +56,36 @@ public sealed class PostingPeriodCalculatorTests
 
         periods.Should().BeEmpty();
     }
+
+    [Fact]
+    public void BiAnnual_periods_end_on_june_and_december()
+    {
+        var periods = PostingPeriodCalculator.Split(
+            new DateOnly(2026, 5, 1), new DateOnly(2027, 6, 30), InterestPostingPeriod.BiAnnual);
+
+        periods.Should().Equal(
+            (new DateOnly(2026, 5, 1), new DateOnly(2026, 6, 30)),
+            (new DateOnly(2026, 7, 1), new DateOnly(2026, 12, 31)),
+            (new DateOnly(2027, 1, 1), new DateOnly(2027, 6, 30)));
+    }
+
+    [Fact]
+    public void Annual_multi_year_span_produces_one_period_per_year()
+    {
+        var periods = PostingPeriodCalculator.Split(
+            new DateOnly(2026, 3, 1), new DateOnly(2027, 12, 31), InterestPostingPeriod.Annual);
+
+        periods.Should().Equal(
+            (new DateOnly(2026, 3, 1), new DateOnly(2026, 12, 31)),
+            (new DateOnly(2027, 1, 1), new DateOnly(2027, 12, 31)));
+    }
+
+    [Fact]
+    public void Monthly_period_ends_on_feb_29_in_leap_year()
+    {
+        var periods = PostingPeriodCalculator.Split(
+            new DateOnly(2028, 2, 1), new DateOnly(2028, 2, 29), InterestPostingPeriod.Monthly);
+
+        periods.Should().Equal((new DateOnly(2028, 2, 1), new DateOnly(2028, 2, 29)));
+    }
 }
