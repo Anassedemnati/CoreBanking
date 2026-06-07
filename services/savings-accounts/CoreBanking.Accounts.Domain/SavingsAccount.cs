@@ -116,10 +116,19 @@ public sealed class SavingsAccount : AggregateRoot, IAuditable
     {
         EnsureTransactionAllowed(on, today);
         EnsurePositive(amount);
+        var tx = InsertWithdrawalUnchecked(on, amount);
+        Raise(new SavingsWithdrawn(Id, tx.Id, on, amount, AccountBalance));
+        return tx.Id;
+    }
 
-        // Simulate: replay the timeline with the candidate withdrawal inserted (Fineract
-        // validateAccountBalanceConstraints) — reject if balance dips below zero at ANY point.
-        var candidate = SavingsAccountTransaction.Create(Id, SavingsTransactionType.Withdrawal, on, amount, NextTransactionSequence());
+    // Inserts a withdrawal candidate, asserts the full-timeline balance never goes
+    // negative (Fineract validateAccountBalanceConstraints), commits it, and recomputes
+    // running balances. Raises NO event and applies NO status/date/pivot guards —
+    // callers (WithdrawMoney, the close-settle) decide which guards run first.
+    private SavingsAccountTransaction InsertWithdrawalUnchecked(DateOnly on, decimal amount)
+    {
+        var candidate = SavingsAccountTransaction.Create(
+            Id, SavingsTransactionType.Withdrawal, on, amount, NextTransactionSequence());
         decimal balance = 0m;
         foreach (var t in _transactions.Append(candidate)
                      .OrderBy(x => x.TransactionDate).ThenBy(x => x.Sequence))
@@ -129,11 +138,9 @@ public sealed class SavingsAccount : AggregateRoot, IAuditable
                 throw new DomainException("account.balance.insufficient",
                     $"Insufficient balance for a withdrawal of {amount} on {on:yyyy-MM-dd}.");
         }
-
         _transactions.Add(candidate);
         RebuildRunningBalances();
-        Raise(new SavingsWithdrawn(Id, candidate.Id, on, amount, AccountBalance));
-        return candidate.Id;
+        return candidate;
     }
 
     public void PostInterest(DateOnly asOf, DateOnly today)
@@ -185,8 +192,8 @@ public sealed class SavingsAccount : AggregateRoot, IAuditable
                     "Close date cannot be before the last transaction date.");
         }
 
-        // Slice 2 (Task 2) fills in the pivot-exempt settle here:
-        // if (withdrawBalance && AccountBalance > 0m) InsertWithdrawalUnchecked(closedOn, AccountBalance);
+        if (withdrawBalance && AccountBalance > 0m)
+            InsertWithdrawalUnchecked(closedOn, AccountBalance);   // pivot-exempt, no event
 
         if (AccountBalance != 0m)
             throw new DomainException("account.close.balance.nonzero",

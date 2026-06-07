@@ -37,21 +37,6 @@ public sealed class SavingsAccountCloseTests
         closedEvent.ClosedOn.Should().Be(new DateOnly(2026, 2, 1));
     }
 
-    [Fact] // AC-3 variant — Task 1 has NO sweep: non-zero balance is rejected even with withdrawBalance:true
-    public void Close_nonzero_balance_with_withdrawBalance_true_is_still_rejected_in_task1()
-    {
-        var a = MakeActive();
-        a.Deposit(new DateOnly(2026, 1, 10), 1000m, Today);
-        a.ClearDomainEvents();
-
-        var act = () => a.Close(new DateOnly(2026, 3, 15), withdrawBalance: true, Today);
-
-        act.Should().Throw<DomainException>().Which.Code.Should().Be("account.close.balance.nonzero");
-        a.Status.Should().Be(SavingsAccountStatus.Active);
-        a.Transactions.Should().HaveCount(1);            // no sweep transaction added (Task 2)
-        a.DomainEvents.Should().BeEmpty();
-    }
-
     [Fact] // AC-11
     public void Close_empty_account_skips_last_transaction_rule()
     {
@@ -126,6 +111,42 @@ public sealed class SavingsAccountCloseTests
             .Should().Throw<DomainException>().Which.Code.Should().Be("account.close.afterlasttransaction");
 
         a.Close(new DateOnly(2026, 3, 10), false, Today); // closedOn == lastTxnDate accepted
+        a.Status.Should().Be(SavingsAccountStatus.Closed);
+    }
+
+    [Fact] // AC-2
+    public void Close_with_sweep_settles_to_zero_records_withdrawal_and_raises_no_withdrawn_event()
+    {
+        var a = MakeActive();
+        a.Deposit(new DateOnly(2026, 1, 10), 1000m, Today);   // balance 1000, no other txns
+        a.ClearDomainEvents();
+
+        a.Close(new DateOnly(2026, 3, 15), withdrawBalance: true, Today);
+
+        a.AccountBalance.Should().Be(0m);
+        a.Status.Should().Be(SavingsAccountStatus.Closed);
+        a.Transactions.Should().Contain(t =>
+            t.Type == SavingsTransactionType.Withdrawal &&
+            t.Amount == 1000m && t.TransactionDate == new DateOnly(2026, 3, 15));
+        a.DomainEvents.OfType<SavingsWithdrawn>().Should().BeEmpty();        // no separate event
+        a.DomainEvents.OfType<SavingsAccountClosed>().Should().ContainSingle()
+            .Which.BalanceAfter.Should().Be(0m);
+    }
+
+    [Fact] // AC-8 — pivot exemption: post interest then close same day
+    public void Close_with_sweep_on_pivot_date_succeeds()
+    {
+        var a = MakeActive();
+        a.Deposit(new DateOnly(2026, 1, 1), 1000m, Today);
+        a.PostInterest(new DateOnly(2026, 1, 31), Today);     // pivot = Jan 31, balance 1004.25
+        a.InterestPostedTillDate.Should().Be(new DateOnly(2026, 1, 31));
+        a.ClearDomainEvents();
+
+        // closedOn == lastTxnDate (Jan 31) == pivot. Public WithdrawMoney would throw
+        // account.transaction.beforepivot; the internal settle is pivot-exempt.
+        a.Close(new DateOnly(2026, 1, 31), withdrawBalance: true, Today);
+
+        a.AccountBalance.Should().Be(0m);
         a.Status.Should().Be(SavingsAccountStatus.Closed);
     }
 }
