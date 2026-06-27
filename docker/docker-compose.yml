@@ -1,4 +1,48 @@
 services:
+
+  # ── Keycloak Identity Provider ────────────────────────────────────────────
+  keycloak-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PWD:-keycloak}
+    volumes:
+      - keycloak-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.1
+    command: start-dev --import-realm
+    ports: ["8180:8080"]
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PWD:-admin123}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PWD:-keycloak}
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8180
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import:ro
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health/ready || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+      start_period: 60s
+
   kafka:
     image: apache/kafka:latest
     ports: ["9092:9092"]
@@ -86,10 +130,14 @@ services:
         condition: service_healthy
       oracle-free:
         condition: service_healthy
+      keycloak:
+        condition: service_healthy
     environment:
       ConnectionStrings__Primary: "User Id=CLIENTS;Password=${ORACLE_PWD};Data Source=oracle-free:1521/FREEPDB1"
       ConnectionStrings__Replica: "User Id=CLIENTS;Password=${ORACLE_PWD};Data Source=oracle-free:1521/FREEPDB1"
       Kafka__BootstrapServers: "kafka:9092"
+      Keycloak__Authority: "http://keycloak:8080/realms/corebanking"
+      Keycloak__MetadataAddress: "http://keycloak:8080/realms/corebanking/.well-known/openid-configuration"
 
   products-svc:
     build:
@@ -101,10 +149,14 @@ services:
         condition: service_healthy
       oracle-free:
         condition: service_healthy
+      keycloak:
+        condition: service_healthy
     environment:
       ConnectionStrings__Primary: "User Id=PRODUCTS;Password=${ORACLE_PWD};Data Source=oracle-free:1521/FREEPDB1"
       ConnectionStrings__Replica: "User Id=PRODUCTS;Password=${ORACLE_PWD};Data Source=oracle-free:1521/FREEPDB1"
       Kafka__BootstrapServers: "kafka:9092"
+      Keycloak__Authority: "http://keycloak:8080/realms/corebanking"
+      Keycloak__MetadataAddress: "http://keycloak:8080/realms/corebanking/.well-known/openid-configuration"
 
   accounts-svc:
     build:
@@ -116,10 +168,14 @@ services:
         condition: service_healthy
       oracle-free:
         condition: service_healthy
+      keycloak:
+        condition: service_healthy
     environment:
       ConnectionStrings__Primary: "User Id=SAVINGS;Password=${ORACLE_PWD};Data Source=oracle-free:1521/FREEPDB1"
       ConnectionStrings__Replica: "User Id=SAVINGS;Password=${ORACLE_PWD};Data Source=oracle-free:1521/FREEPDB1"
       Kafka__BootstrapServers: "kafka:9092"
+      Keycloak__Authority: "http://keycloak:8080/realms/corebanking"
+      Keycloak__MetadataAddress: "http://keycloak:8080/realms/corebanking/.well-known/openid-configuration"
 
   gateway:
     build:
@@ -131,3 +187,26 @@ services:
       ReverseProxy__Clusters__clients-cluster__Destinations__primary__Address: "http://clients-svc:8080"
       ReverseProxy__Clusters__products-cluster__Destinations__primary__Address: "http://products-svc:8080"
       ReverseProxy__Clusters__accounts-cluster__Destinations__primary__Address: "http://accounts-svc:8080"
+
+  # ── Frontend (profile: ui) — run locally with 'npm run dev' for hot-reload ─
+  corebanking-ui:
+    build:
+      context: ../client/corebanking-ui
+      dockerfile: Dockerfile.dev
+    profiles: ["ui"]
+    ports: ["5173:5173"]
+    volumes:
+      - ../client/corebanking-ui/src:/app/src
+    environment:
+      VITE_KEYCLOAK_URL: "http://localhost:8180"
+      VITE_KEYCLOAK_REALM: "corebanking"
+      VITE_KEYCLOAK_CLIENT_ID: "corebanking-ui"
+      VITE_API_BASE_URL: "http://localhost:5100"
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      gateway:
+        condition: service_started
+
+volumes:
+  keycloak-db-data:

@@ -2,8 +2,11 @@ using CoreBanking.Accounts.Application.Accounts;
 using CoreBanking.Accounts.Infrastructure;
 using CoreBanking.BuildingBlocks.Application;
 using CoreBanking.BuildingBlocks.Infrastructure;
+using CoreBanking.BuildingBlocks.Infrastructure.Security;
 using FluentValidation;
 using Mediator;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +21,19 @@ builder.Services.AddMediator(o =>
 builder.Services.AddValidatorsFromAssemblyContaining<SubmitSavingsApplicationValidator>(ServiceLifetime.Scoped);
 
 builder.Services.AddSavingsAccountsInfrastructure(builder.Configuration);
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = builder.Configuration["Keycloak:Authority"];
+        options.MetadataAddress = builder.Configuration["Keycloak:MetadataAddress"] ?? $"{builder.Configuration["Keycloak:Authority"]}/.well-known/openid-configuration";
+        options.RequireHttpsMetadata = false;
+        options.MapInboundClaims = false;
+        options.TokenValidationParameters.ValidateAudience = false;
+    });
+builder.Services.AddAuthorization();
+builder.Services.AddTransient<IClaimsTransformation, KeycloakRolesClaimsTransformation>();
 
 builder.Services.AddExceptionHandler<ExceptionToProblemDetailsHandler>();
 builder.Services.AddProblemDetails();
@@ -41,6 +57,8 @@ builder.Services.AddOpenApi(options =>
 var app = builder.Build();
 
 app.UseExceptionHandler();
+app.UseAuthentication();
+app.UseAuthorization();
 
 if (app.Environment.IsDevelopment())
     app.MapOpenApi();

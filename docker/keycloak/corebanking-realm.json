@@ -1,0 +1,130 @@
+{
+  "id": "corebanking",
+  "realm": "corebanking",
+  "displayName": "CoreBanking",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": false,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "roles": {
+    "realm": [
+      {
+        "name": "teller",
+        "description": "Bank teller — registers clients, submits account applications, processes deposits/withdrawals"
+      },
+      {
+        "name": "branch-manager",
+        "description": "Branch manager — approves, rejects, activates and closes accounts; activates clients; posts interest"
+      },
+      {
+        "name": "ops-officer",
+        "description": "Operations officer — creates and manages savings product templates"
+      },
+      {
+        "name": "head-office-admin",
+        "description": "Head office administrator — full access to all features across all services"
+      },
+      {
+        "name": "auditor",
+        "description": "Auditor — read-only view of all clients, products and accounts"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "corebanking-ui",
+      "name": "CoreBanking UI",
+      "description": "React SPA used by bank staff to manage clients, products and savings accounts",
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      },
+      "redirectUris": [
+        "http://localhost:5173/*",
+        "http://localhost:80/*",
+        "http://localhost/*"
+      ],
+      "webOrigins": [
+        "http://localhost:5173",
+        "http://localhost:80",
+        "http://localhost"
+      ],
+      "fullScopeAllowed": true
+    }
+  ],
+  "users": [
+    {
+      "username": "teller.demo",
+      "enabled": true,
+      "firstName": "Alice",
+      "lastName": "Teller",
+      "email": "teller@corebanking.demo",
+      "emailVerified": true,
+      "credentials": [
+        { "type": "password", "value": "demo1234", "temporary": false }
+      ],
+      "realmRoles": ["teller"]
+    },
+    {
+      "username": "manager.demo",
+      "enabled": true,
+      "firstName": "Bob",
+      "lastName": "Manager",
+      "email": "manager@corebanking.demo",
+      "emailVerified": true,
+      "credentials": [
+        { "type": "password", "value": "demo1234", "temporary": false }
+      ],
+      "realmRoles": ["branch-manager"]
+    },
+    {
+      "username": "ops.demo",
+      "enabled": true,
+      "firstName": "Carol",
+      "lastName": "Operations",
+      "email": "ops@corebanking.demo",
+      "emailVerified": true,
+      "credentials": [
+        { "type": "password", "value": "demo1234", "temporary": false }
+      ],
+      "realmRoles": ["ops-officer"]
+    },
+    {
+      "username": "admin.demo",
+      "enabled": true,
+      "firstName": "Dave",
+      "lastName": "Admin",
+      "email": "admin@corebanking.demo",
+      "emailVerified": true,
+      "credentials": [
+        { "type": "password", "value": "demo1234", "temporary": false }
+      ],
+      "realmRoles": ["head-office-admin"]
+    },
+    {
+      "username": "auditor.demo",
+      "enabled": true,
+      "firstName": "Eve",
+      "lastName": "Auditor",
+      "email": "auditor@corebanking.demo",
+      "emailVerified": true,
+      "credentials": [
+        { "type": "password", "value": "demo1234", "temporary": false }
+      ],
+      "realmRoles": ["auditor"]
+    }
+  ]
+}
