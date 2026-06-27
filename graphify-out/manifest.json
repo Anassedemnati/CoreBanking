@@ -1,0 +1,570 @@
+{
+  "/Users/mac/Documents/Projects/CoreBanking/tests/CoreBanking.ContractTests/IntegrationEventContractTests.cs": {
+    "mtime": 1780774528.739793,
+    "hash": "ea326d98c21a5e890e97aef6248b7ec8"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Infrastructure/Outbox/OutboxProcessor.cs": {
+    "mtime": 1780767872.294462,
+    "hash": "33d5c0a39e208fe511c3be6544d8f2bf"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Infrastructure/Outbox/OutboxProcessorOptions.cs": {
+    "mtime": 1780767863.467892,
+    "hash": "be58cde975c54eadf2dbb9b281f9887e"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Infrastructure/Outbox/IOutboxDbContext.cs": {
+    "mtime": 1780767865.2206173,
+    "hash": "af620c44f2fdee7a63eeda76e629ed49"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Infrastructure/Interceptors/ConvertDomainEventsToOutboxInterceptor.cs": {
+    "mtime": 1780767505.2187817,
+    "hash": "697c6f3d2e3b322d7607fbb411cdd1ae"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Infrastructure/Interceptors/AuditableEntityInterceptor.cs": {
+    "mtime": 1780767480.7388542,
+    "hash": "26154eb5c676decebe146f9ed3562983"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Infrastructure/Inbox/IInboxService.cs": {
+    "mtime": 1780768059.3334394,
+    "hash": "e6ae53489504b5349bc80a37ba8238ec"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Infrastructure/Http/ExceptionHandlerMiddleware.cs": {
+    "mtime": 1780770085.525247,
+    "hash": "dd66b24d6b67868456f360b5575dda65"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/tests/CoreBanking.BuildingBlocks.UnitTests/ExceptionTests.cs": {
+    "mtime": 1780766455.130225,
+    "hash": "7916f30dd8778b1c33386c24acb1a7d7"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/tests/CoreBanking.BuildingBlocks.UnitTests/AggregateRootTests.cs": {
+    "mtime": 1780766175.1109328,
+    "hash": "0e68f8fcd8042a2ab92dadf5a8997b3e"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/tests/CoreBanking.BuildingBlocks.UnitTests/ValidationBehaviorTests.cs": {
+    "mtime": 1780767166.2364964,
+    "hash": "041b5781a849df6812d88a00a376e3f8"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/tests/CoreBanking.BuildingBlocks.IntegrationTests/KafkaRoundTripTests.cs": {
+    "mtime": 1780768150.0480878,
+    "hash": "8b1c451cfecf6d03eb137be5c1ec2b71"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Domain/AggregateRoot.cs": {
+    "mtime": 1780766188.960033,
+    "hash": "8dc08aac9b6ed91a1852b985b41881e3"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Domain/IAuditable.cs": {
+    "mtime": 1780766471.0647657,
+    "hash": "3a547f5bcaae8706e0a208764e95a897"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Domain/IDomainEvent.cs": {
+    "mtime": 1780766185.2784863,
+    "hash": "da6ebb529564417a93f4f1634864f2f3"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Domain/Entity.cs": {
+    "mtime": 1780766187.158121,
+    "hash": "aebf2507611ce3c088b7f29fbff9e403"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Domain/Exceptions/NotFoundException.cs": {
+    "mtime": 1780766473.7369924,
+    "hash": "ad4a5ba3188bd02200d654b9db98a4fd"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Domain/Exceptions/DomainException.cs": {
+    "mtime": 1780766472.0994482,
+    "hash": "bc7748fa774900e554ec5a6b56b4f607"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Application/Exceptions/ValidationException.cs": {
+    "mtime": 1780766611.9796064,
+    "hash": "47dc3566bdcc89f6161a8c5272a8a98a"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Application/Behaviors/LoggingBehavior.cs": {
+    "mtime": 1780767146.012605,
+    "hash": "a8cbf860996cf1cac13649df27dc92fe"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Application/Behaviors/ValidationBehavior.cs": {
+    "mtime": 1780767151.3819907,
+    "hash": "5d11f78389264e0f38075022f3ac6b80"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Application/Abstractions/IDateTimeProvider.cs": {
+    "mtime": 1780766775.3096275,
+    "hash": "a659568f6ed537296412e65e99d2de3d"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Application/Abstractions/ICurrentUser.cs": {
+    "mtime": 1780766774.2828918,
+    "hash": "b971c812f91edacb49235a9c8f475815"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Messaging/IntegrationEvent.cs": {
+    "mtime": 1780767252.5523942,
+    "hash": "3ff6f87d0e58b43aec8f240062c2de2e"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Messaging/OutboxMessage.cs": {
+    "mtime": 1780767255.557843,
+    "hash": "1e52ac13945de6a98c75c04779879f20"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Messaging/InboxMessage.cs": {
+    "mtime": 1780767256.8843594,
+    "hash": "b71d3b0425117fd85f30f0e6d5315125"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Messaging/IEventBus.cs": {
+    "mtime": 1780767253.6163652,
+    "hash": "fac1380d8b767a7cbe60c16fa58a23a8"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Messaging/Kafka/KafkaEventBus.cs": {
+    "mtime": 1780767707.0156796,
+    "hash": "46f57ddbeeb3545753b85b7ab9638919"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Messaging/Kafka/KafkaOptions.cs": {
+    "mtime": 1780767698.6046793,
+    "hash": "17a00c0319ed3499f785937884af9ca8"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/shared/CoreBanking.BuildingBlocks.Messaging/Kafka/KafkaConsumerBackgroundService.cs": {
+    "mtime": 1780768071.1573436,
+    "hash": "693f0e400bb9332d2eb033c16de28f1b"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Application/ReadModels/ClientRef.cs": {
+    "mtime": 1780771299.837238,
+    "hash": "a368f7624afff41099b397f9fa863b39"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Application/ReadModels/ProductRef.cs": {
+    "mtime": 1780771301.834749,
+    "hash": "b9ec6c94636435f242e6d70c1f09f9e5"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Application/Accounts/ApproveSavingsAccount.cs": {
+    "mtime": 1780771322.3521962,
+    "hash": "bfc7eeebf09923dae9d6f5dd18eadd78"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Application/Accounts/GetSavingsAccountById.cs": {
+    "mtime": 1780771344.0324786,
+    "hash": "dc7bf002733081c92e9cab38e9a7e328"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Application/Accounts/SubmitSavingsApplication.cs": {
+    "mtime": 1780771316.9828029,
+    "hash": "05c7ac64290301c72854c1c9532b5aba"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Application/Accounts/WithdrawSavingsApplication.cs": {
+    "mtime": 1780771338.9046733,
+    "hash": "9b10d508bdccad5d9157605b268ea73a"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Application/Accounts/RejectSavingsAccount.cs": {
+    "mtime": 1780771332.7160451,
+    "hash": "100860f89b5c99cd7f94c75d6e876c03"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Application/Accounts/ActivateSavingsAccount.cs": {
+    "mtime": 1780771327.332657,
+    "hash": "aa5dbbc3a1caf06c763483026c8f8ee7"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Application/Accounts/SavingsAccountDto.cs": {
+    "mtime": 1780772245.9901965,
+    "hash": "67218667b455efa84472e067cc6fa61a"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Application/Abstractions/ISavingsAccountReadRepository.cs": {
+    "mtime": 1780771292.817121,
+    "hash": "68a8dda1db1bacd72560bf0d01893ae3"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Application/Abstractions/IClientRefRepository.cs": {
+    "mtime": 1780772445.4396138,
+    "hash": "cad9108a66b24106b93cdd36c294d3bd"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Application/Abstractions/ISavingsAccountRepository.cs": {
+    "mtime": 1780771290.4640305,
+    "hash": "b0a98e2b0c324b1a46c0232080cbae22"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Application/Abstractions/IProductRefRepository.cs": {
+    "mtime": 1780772447.1117024,
+    "hash": "044847d2f5dfc4e7b77130496e06c677"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Application/Abstractions/ISavingsAccountUnitOfWork.cs": {
+    "mtime": 1780771291.5034268,
+    "hash": "c606779e232c3438fe60618d5d38de01"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Api/Program.cs": {
+    "mtime": 1780775469.3563457,
+    "hash": "20165f9d94487fde8c4bed8451fadfec"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Api/Controllers/SavingsAccountsController.cs": {
+    "mtime": 1780775545.825612,
+    "hash": "4eb94800897cf8983d50f37d92150fe4"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/tests/CoreBanking.Accounts.ArchTests/ArchitectureTests.cs": {
+    "mtime": 1780774468.0980768,
+    "hash": "1826883344805baf116c6d3f73ec563f"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/tests/CoreBanking.Accounts.UnitTests/SubmitSavingsApplicationHandlerTests.cs": {
+    "mtime": 1780771590.2470965,
+    "hash": "4c09bd447c4c9bdedcac1753fb8f8294"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/tests/CoreBanking.Accounts.UnitTests/SavingsAccountTests.cs": {
+    "mtime": 1780771268.3425748,
+    "hash": "ca6632d5ba482b717c4d3b0a86e5a42e"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/tests/CoreBanking.Accounts.UnitTests/Consumers/ClientsConsumerTests.cs": {
+    "mtime": 1780773533.8705766,
+    "hash": "e6d7aa14705fe8f1e7c008cccb22c00c"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/tests/CoreBanking.Accounts.UnitTests/Consumers/ProductsConsumerTests.cs": {
+    "mtime": 1780773417.222022,
+    "hash": "e8ae9a631b8dd4fbaa668856f6d6a5d7"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Infrastructure/DependencyInjection.cs": {
+    "mtime": 1780772587.1747499,
+    "hash": "fc1f17c63c9a1f13193ae019f22be35b"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Infrastructure/Inbox/InboxService.cs": {
+    "mtime": 1780772468.467953,
+    "hash": "bdeaddac8d3cc686ac65f175a6d47384"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Infrastructure/Consumers/ClientsConsumer.cs": {
+    "mtime": 1780773402.0357945,
+    "hash": "b63d2d0dd2ad1be308fbe8efc0af322b"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Infrastructure/Consumers/ProductsConsumer.cs": {
+    "mtime": 1780773405.9488916,
+    "hash": "bd60d4d16b350074b0d70b603934fb3c"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Infrastructure/Persistence/ProductRefRepository.cs": {
+    "mtime": 1780772456.4288266,
+    "hash": "b0d32efa961cf56fe77fac95cb83da42"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Infrastructure/Persistence/SavingsAccountsWriteDbContext.cs": {
+    "mtime": 1780771424.1127384,
+    "hash": "c0ca3f318f77aef0a013ef4f2ccdd452"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Infrastructure/Persistence/SavingsAccountRepository.cs": {
+    "mtime": 1780771437.1522996,
+    "hash": "e1e6512538fa197c83ecd0ccf21fcfd5"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Infrastructure/Persistence/SavingsAccountUnitOfWork.cs": {
+    "mtime": 1780771447.8894155,
+    "hash": "5550272737b19d4fc938c9e1e1a93097"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Infrastructure/Persistence/SavingsAccountReadRepository.cs": {
+    "mtime": 1780772247.2173877,
+    "hash": "3fac99aa718650e2e3e02808114ac6b6"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Infrastructure/Persistence/SavingsAccountsWriteDbContextFactory.cs": {
+    "mtime": 1780771463.4997869,
+    "hash": "2c7971c165706e2ae2bdc0bef6048d53"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Infrastructure/Persistence/SavingsAccountsReadDbContext.cs": {
+    "mtime": 1780771429.7242236,
+    "hash": "cb91dfcfcd73974a722e95f9143dbce0"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Infrastructure/Persistence/ClientRefRepository.cs": {
+    "mtime": 1780772453.4314413,
+    "hash": "47dda8630a065f824085c963da5d6df4"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Infrastructure/Persistence/Configurations/ClientRefConfiguration.cs": {
+    "mtime": 1780771388.7053514,
+    "hash": "3142cdfc486a3d7c2bda9f805f0cdc1e"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Infrastructure/Persistence/Configurations/ProductRefConfiguration.cs": {
+    "mtime": 1780771394.1919885,
+    "hash": "59ac577e2bd3248219ef24f949644d3c"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Infrastructure/Persistence/Configurations/SavingsAccountConfiguration.cs": {
+    "mtime": 1780771383.471649,
+    "hash": "8b973bff05d1f084fee56884b80c3ffa"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Infrastructure/Persistence/Migrations/20260606184750_InitialSavings.Designer.cs": {
+    "mtime": 1780771671.0588853,
+    "hash": "12c9bfb70b31d26029918241b9450cbd"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Infrastructure/Persistence/Migrations/SavingsAccountsWriteDbContextModelSnapshot.cs": {
+    "mtime": 1780771671.060647,
+    "hash": "34d989d6be83eec97e36e7ab28dcb0ef"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Infrastructure/Persistence/Migrations/20260606184750_InitialSavings.cs": {
+    "mtime": 1780771671.0578225,
+    "hash": "faee654d0be432655bdb35bafbf56bc4"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Infrastructure/Events/SavingsAccountIntegrationEvents.cs": {
+    "mtime": 1780771373.577038,
+    "hash": "a61a27a7509fbf2fba93575af806726a"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Infrastructure/Services/SystemCurrentUser.cs": {
+    "mtime": 1780771468.0107355,
+    "hash": "dfed1224e6e5cfbed7bb37a7648b34e6"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Infrastructure/Services/UtcDateTimeProvider.cs": {
+    "mtime": 1780771472.0865483,
+    "hash": "f2f40938d0db265eb104069c4204fc04"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Domain/SavingsAccount.cs": {
+    "mtime": 1780771282.133231,
+    "hash": "79e2f5ba1831897179494970d3e2d04c"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Domain/SavingsAccountStatus.cs": {
+    "mtime": 1780771248.412631,
+    "hash": "5b579c9b138fcd3b147dca7f1fc84f2c"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-accounts/CoreBanking.Accounts.Domain/Events/SavingsAccountEvents.cs": {
+    "mtime": 1780771250.7896757,
+    "hash": "61665fbb7e5464d091c5a483638b2492"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Domain/Client.cs": {
+    "mtime": 1780768894.2501404,
+    "hash": "00578e1d8f17978a6955bd804e057394"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Domain/ClientStatus.cs": {
+    "mtime": 1780768886.9224696,
+    "hash": "3d102d6e8debb6e6e399f0e34f55219d"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Domain/Events/ClientRegistered.cs": {
+    "mtime": 1780768888.372852,
+    "hash": "6710d5e7bccfe7c3301a31d6256e3653"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Domain/Events/ClientActivated.cs": {
+    "mtime": 1780768889.4006553,
+    "hash": "ad584ee51fe62aec1f35588608e3a671"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Api/Program.cs": {
+    "mtime": 1780775467.267768,
+    "hash": "e323efc0a27419b53c37aaf79d9a6f6f"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Api/Controllers/ClientsController.cs": {
+    "mtime": 1780775492.5962667,
+    "hash": "7356b1425888a1abf62a6e3189b8ba1b"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/tests/CoreBanking.Clients.UnitTests/RegisterClientHandlerTests.cs": {
+    "mtime": 1780769185.3529763,
+    "hash": "6f9d93ab314c587f2f333dad399f1c3a"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/tests/CoreBanking.Clients.UnitTests/ClientTests.cs": {
+    "mtime": 1780768869.6697047,
+    "hash": "7b6e032e576f0724921016de3bc455e3"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/tests/CoreBanking.Clients.ArchTests/ArchitectureTests.cs": {
+    "mtime": 1780774454.8509047,
+    "hash": "8edf5b9c6d8f5b81a76f2739caf4ae0f"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Infrastructure/DependencyInjection.cs": {
+    "mtime": 1780773378.3227763,
+    "hash": "8606ad083a320c6fe84348ee4de50a97"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Infrastructure/Persistence/ClientsWriteDbContext.cs": {
+    "mtime": 1780769502.8551545,
+    "hash": "308d69d2d0b4bf81d1f61f0a17f55794"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Infrastructure/Persistence/ClientReadRepository.cs": {
+    "mtime": 1780769518.9385235,
+    "hash": "701502df19e0f7345c6861621116c0d9"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Infrastructure/Persistence/ClientsWriteDbContextFactory.cs": {
+    "mtime": 1780769632.5925672,
+    "hash": "fddfe6ddadc28fbcb3ca867ca322871f"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Infrastructure/Persistence/ClientRepository.cs": {
+    "mtime": 1780769513.6184971,
+    "hash": "617668fca9e96846d5cb2b259f06fab9"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Infrastructure/Persistence/ClientsReadDbContext.cs": {
+    "mtime": 1780769507.857398,
+    "hash": "2ceb3c81ec39882d0fe02830befd6496"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Infrastructure/Persistence/UnitOfWork.cs": {
+    "mtime": 1780769523.7345703,
+    "hash": "4735efa0333a6394176886ceefa8c01d"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Infrastructure/Persistence/Configurations/ClientConfiguration.cs": {
+    "mtime": 1780769491.0102203,
+    "hash": "4cf7858869aea51801a0b183a5dd558a"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Infrastructure/Persistence/Migrations/20260606181446_InitialClients.cs": {
+    "mtime": 1780769686.6017613,
+    "hash": "1ffac7a63ee2c8ebd8cc4550f360fa3b"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Infrastructure/Persistence/Migrations/20260606181446_InitialClients.Designer.cs": {
+    "mtime": 1780769686.6020439,
+    "hash": "19607c92e5facb90e01a222fd21d3af0"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Infrastructure/Persistence/Migrations/ClientsWriteDbContextModelSnapshot.cs": {
+    "mtime": 1780769686.602439,
+    "hash": "83ce67d939ab62c3dab8d95c38bd3135"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Infrastructure/Services/SystemCurrentUser.cs": {
+    "mtime": 1780769528.5994952,
+    "hash": "50fdc5792c59c63713b3f3ece6ea87a4"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Infrastructure/Services/UtcDateTimeProvider.cs": {
+    "mtime": 1780769532.987923,
+    "hash": "799f27b3d8f970370f018b91d8492213"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Application/Clients/ActivateClient.cs": {
+    "mtime": 1780769207.9412942,
+    "hash": "998a4080ef547c41d102f637db8b0b41"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Application/Clients/RegisterClient.cs": {
+    "mtime": 1780769204.7073958,
+    "hash": "f30fda047af269043ec4138f8099d71c"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Application/Clients/GetClientById.cs": {
+    "mtime": 1780769209.5082874,
+    "hash": "9371be6c9b84040266cf3a91ff564020"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Application/Clients/ClientDto.cs": {
+    "mtime": 1780769167.680552,
+    "hash": "47b778b91492bca1e7585f60297b751d"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Application/Abstractions/IClientRepository.cs": {
+    "mtime": 1780769165.4985,
+    "hash": "29534ba978b4d58826d92bd4caf8f531"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Application/Abstractions/IClientReadRepository.cs": {
+    "mtime": 1780769172.4522057,
+    "hash": "3e5b5cb0a3feb4f43b35ab613b15a8ac"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Application/Abstractions/IUnitOfWork.cs": {
+    "mtime": 1780769166.5353212,
+    "hash": "de81821dfc283a7de6bc22110dd0c60d"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/clients/CoreBanking.Clients.Contracts/ClientIntegrationEvents.cs": {
+    "mtime": 1780773354.8238533,
+    "hash": "eaa67ae6b6ce7f602050064f5b0be5dd"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Api/Program.cs": {
+    "mtime": 1780775468.3300176,
+    "hash": "e93e89f15095add4ffc7276a97d45942"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Api/Controllers/SavingsProductsController.cs": {
+    "mtime": 1780775507.9143133,
+    "hash": "fb7f84b1a073056f8a81fa82c7f8a607"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/tests/CoreBanking.Products.UnitTests/CreateSavingsProductHandlerTests.cs": {
+    "mtime": 1780770651.4045978,
+    "hash": "63e74bbda8afb3258e30269d2c7a4766"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/tests/CoreBanking.Products.UnitTests/SavingsProductTests.cs": {
+    "mtime": 1780770639.0502996,
+    "hash": "757d6fa9447c756771737e40fec174b3"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/tests/CoreBanking.Products.ArchTests/ArchitectureTests.cs": {
+    "mtime": 1780774461.3088167,
+    "hash": "a02a7d0658f817750e376bbdd8a5296c"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Contracts/SavingsProductIntegrationEvents.cs": {
+    "mtime": 1780773360.0949447,
+    "hash": "233022b82c41d885374217d9b2972896"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Application/Products/GetSavingsProductById.cs": {
+    "mtime": 1780770616.7480345,
+    "hash": "39e350295ff62ff233852396db37162a"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Application/Products/CreateSavingsProduct.cs": {
+    "mtime": 1780770611.4150178,
+    "hash": "a979b7093e9cff6a91c483f4918cb79e"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Application/Products/SavingsProductDto.cs": {
+    "mtime": 1780770602.4599862,
+    "hash": "48ca6ef930f92aeb3f457e8968f0b957"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Application/Products/ListSavingsProducts.cs": {
+    "mtime": 1780770621.502189,
+    "hash": "a820eb3b1d2397c376e9382cff2c91a2"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Application/Abstractions/ISavingsProductRepository.cs": {
+    "mtime": 1780770590.4674258,
+    "hash": "0aa0fcfb540637421e821f2a0e0cdfd0"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Application/Abstractions/ISavingsProductReadRepository.cs": {
+    "mtime": 1780770598.2709947,
+    "hash": "c1657f6dfd0623e8422e879c9b9b2ac2"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Application/Abstractions/IProductUnitOfWork.cs": {
+    "mtime": 1780770594.2213836,
+    "hash": "93ca850284ca907e415e90cfab2e30f6"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Domain/SavingsProduct.cs": {
+    "mtime": 1780770583.3735936,
+    "hash": "1ab1faf097c8fac50821c326143a2bca"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Domain/Currency.cs": {
+    "mtime": 1780770562.754953,
+    "hash": "3ca754a4f0d394e2487bb470ffa88649"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Domain/InterestSettings.cs": {
+    "mtime": 1780770567.1396854,
+    "hash": "4ffd49b44ab8e4f562e4788cb68d1b3a"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Domain/SavingsProductStatus.cs": {
+    "mtime": 1780770570.8973656,
+    "hash": "3787e0e5ebc453228a7143f2de58bbd5"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Domain/Events/SavingsProductCreated.cs": {
+    "mtime": 1780770575.0947733,
+    "hash": "3f7c69b15a9c525c9a36308fec54a7e6"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Infrastructure/DependencyInjection.cs": {
+    "mtime": 1780773390.429156,
+    "hash": "103442547d591dabc343ce0f5c70d3b9"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Infrastructure/Persistence/ProductUnitOfWork.cs": {
+    "mtime": 1780770702.1942189,
+    "hash": "68478af5348126d53fe43b265bab82d8"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Infrastructure/Persistence/SavingsProductReadRepository.cs": {
+    "mtime": 1780770698.146033,
+    "hash": "5d0d801c29ad1e86f6246b6a7d577ba5"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Infrastructure/Persistence/SavingsProductRepository.cs": {
+    "mtime": 1780770691.2831407,
+    "hash": "aea875f4981b429efbdbe0ee28d0bee3"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Infrastructure/Persistence/SavingsProductsReadDbContext.cs": {
+    "mtime": 1780770686.3643932,
+    "hash": "92bee8641fdd4add127b88b936862769"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Infrastructure/Persistence/SavingsProductsWriteDbContext.cs": {
+    "mtime": 1780770681.3622117,
+    "hash": "5d37ce5a89c5aea7f7bfe4b407bdcfa2"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Infrastructure/Persistence/SavingsProductsWriteDbContextFactory.cs": {
+    "mtime": 1780770707.1571553,
+    "hash": "52b500ab5e10ea3ed3a3bb7f8135e363"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Infrastructure/Persistence/Configurations/SavingsProductConfiguration.cs": {
+    "mtime": 1780770674.5099227,
+    "hash": "6ccfce6a46a28da471596bec84108cb5"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Infrastructure/Persistence/Migrations/SavingsProductsWriteDbContextModelSnapshot.cs": {
+    "mtime": 1780770853.204313,
+    "hash": "bde554751b34c047901c8f8ee3427547"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Infrastructure/Persistence/Migrations/20260606183413_InitialProducts.cs": {
+    "mtime": 1780770853.2034068,
+    "hash": "f86f71d5467cb41e274e08a2171aeb7b"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Infrastructure/Persistence/Migrations/20260606183413_InitialProducts.Designer.cs": {
+    "mtime": 1780770853.2038858,
+    "hash": "2124bc4e2eb6c6e523db5740cb19aff9"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Infrastructure/Services/SystemCurrentUser.cs": {
+    "mtime": 1780770711.2208228,
+    "hash": "618c08f946ca2987f53412fd1bb8116d"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/services/savings-products/CoreBanking.Products.Infrastructure/Services/UtcDateTimeProvider.cs": {
+    "mtime": 1780770715.4517772,
+    "hash": "781580816c97e6e39e69cc331b1618c8"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/gateway/tests/CoreBanking.Gateway.IntegrationTests/GatewayRoutingTests.cs": {
+    "mtime": 1780773794.9813337,
+    "hash": "461743a72ca28fb94fca7c594f20aae6"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/gateway/CoreBanking.Gateway/Program.cs": {
+    "mtime": 1780773748.2837899,
+    "hash": "2fc48099ff19850ee41c2c128d560582"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/gateway/CoreBanking.Gateway/Middleware/CorrelationIdMiddleware.cs": {
+    "mtime": 1780773959.5807536,
+    "hash": "fcc73a9906f0564974a743b6dd803450"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/EXECUTION_PLAN.md": {
+    "mtime": 1780764961.8163967,
+    "hash": "4d4fa84b34687126f959e7b049fe0700"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/IMPLEMENTATION_PLAN.md": {
+    "mtime": 1780759722.5543213,
+    "hash": "a8784f985fbc2fb2fe936e745ebf5f56"
+  },
+  "/Users/mac/Documents/Projects/CoreBanking/docker/docker-compose.yml": {
+    "mtime": 1780776187.2403512,
+    "hash": "eeb41ceecf77ade3633a10757ec1a644"
+  }
+}
