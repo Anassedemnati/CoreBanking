@@ -30,6 +30,29 @@ public sealed class SavingsAccountReadRepository(SavingsAccountsReadDbContext db
             .FirstOrDefaultAsync(ct);
     }
 
+    public async Task<IReadOnlyList<SavingsAccountDto>> ListAsync(CancellationToken ct = default)
+    {
+        return await db.SavingsAccounts
+            .OrderByDescending(a => a.SubmittedOn)
+            .Select(a => new SavingsAccountDto(
+                a.Id,
+                a.AccountNo,
+                a.ClientId,
+                a.ProductId,
+                a.Status.ToString(),
+                a.CurrencyCode,
+                a.NominalAnnualRate,
+                a.SubmittedOn,
+                a.ApprovedOn,
+                a.ActivatedOn,
+                a.RejectedOn,
+                a.WithdrawnOn,
+                a.AccountBalance,
+                a.InterestPostedTillDate,
+                a.ClosedOn))
+            .ToListAsync(ct);
+    }
+
     public async Task<IReadOnlyList<SavingsTransactionDto>> FindTransactionsAsync(
         Guid accountId, CancellationToken ct = default)
     {

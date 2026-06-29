@@ -4,21 +4,20 @@ import type { ClientDto, SavingsProductDto } from '../../../api/types';
 interface Props {
   client: ClientDto;
   product: SavingsProductDto;
-  accountNo: string;
   submittedOn: string;
-  onAccountNoChange: (v: string) => void;
   onDateChange: (v: string) => void;
   apiError?: string | null;
 }
 
 export function Step3Review({
-  client, product, accountNo, submittedOn, onAccountNoChange, onDateChange, apiError,
+  client, product, submittedOn, onDateChange, apiError,
 }: Props) {
   return (
     <Box>
       <Typography variant="h6" gutterBottom>Review & Submit</Typography>
       <Typography variant="body2" color="text.secondary" mb={3}>
-        Verify the details below and enter the account number before submitting.
+        Verify the details below before submitting. The account number is generated
+        automatically once the application is created.
       </Typography>
 
       {apiError && <Alert severity="error" sx={{ mb: 2 }}>{apiError}</Alert>}
@@ -51,17 +50,6 @@ export function Step3Review({
       <Divider sx={{ mb: 3 }} />
 
       <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Account Number *"
-            value={accountNo}
-            onChange={(e) => onAccountNoChange(e.target.value)}
-            fullWidth
-            helperText="Unique account number, max 50 characters"
-            inputProps={{ maxLength: 50 }}
-            required
-          />
-        </Grid>
         <Grid item xs={12} sm={6}>
           <TextField
             label="Submission Date *"

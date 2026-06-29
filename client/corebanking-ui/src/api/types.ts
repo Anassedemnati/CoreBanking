@@ -60,7 +60,6 @@ export interface SavingsAccountDto {
 export interface SubmitAccountRequest {
   clientId: string;
   productId: string;
-  accountNo: string;
   currencyCode: string;
   currencyDecimalPlaces: number;
   nominalAnnualRate: number;

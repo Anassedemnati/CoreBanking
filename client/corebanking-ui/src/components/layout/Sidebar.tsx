@@ -4,78 +4,59 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Divider,
   Box,
   Typography,
-  Collapse,
 } from '@mui/material';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import PeopleIcon from '@mui/icons-material/People';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import AddCardIcon from '@mui/icons-material/AddCard';
-import CategoryIcon from '@mui/icons-material/Category';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
+import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
+import PersonAddRoundedIcon from '@mui/icons-material/PersonAddRounded';
+import AccountBalanceRoundedIcon from '@mui/icons-material/AccountBalanceRounded';
+import AddCardRoundedIcon from '@mui/icons-material/AddCardRounded';
+import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded';
+import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 import { useAuth } from '../../auth/AuthProvider';
 import { CAN, type Role } from '../../auth/roles';
+import { BrandLogo } from '../../branding/BrandLogo';
 
-export const DRAWER_WIDTH = 248;
+export const DRAWER_WIDTH = 264;
 
 interface NavItem {
   label: string;
   icon: React.ReactNode;
-  path?: string;
-  children?: NavItem[];
+  path: string;
   roles?: readonly Role[];
 }
 
-const NAV_ITEMS: NavItem[] = [
+interface NavSection {
+  heading: string;
+  items: NavItem[];
+}
+
+const NAV_SECTIONS: NavSection[] = [
   {
-    label: 'Dashboard',
-    icon: <DashboardIcon fontSize="small" />,
-    path: '/',
+    heading: 'Overview',
+    items: [{ label: 'Dashboard', icon: <DashboardRoundedIcon fontSize="small" />, path: '/' }],
   },
   {
-    label: 'Clients',
-    icon: <PeopleIcon fontSize="small" />,
-    children: [
-      { label: 'All Clients', icon: <PeopleIcon fontSize="small" />, path: '/clients' },
-      {
-        label: 'Register Client',
-        icon: <PersonAddIcon fontSize="small" />,
-        path: '/clients/new',
-        roles: CAN.registerClient,
-      },
+    heading: 'Clients',
+    items: [
+      { label: 'All Clients', icon: <PeopleRoundedIcon fontSize="small" />, path: '/clients' },
+      { label: 'Register Client', icon: <PersonAddRoundedIcon fontSize="small" />, path: '/clients/new', roles: CAN.registerClient },
     ],
   },
   {
-    label: 'Products',
-    icon: <CategoryIcon fontSize="small" />,
-    children: [
-      { label: 'All Products', icon: <CategoryIcon fontSize="small" />, path: '/products' },
-      {
-        label: 'Create Product',
-        icon: <AddCircleOutlineIcon fontSize="small" />,
-        path: '/products/new',
-        roles: CAN.createProduct,
-      },
+    heading: 'Products',
+    items: [
+      { label: 'All Products', icon: <CategoryRoundedIcon fontSize="small" />, path: '/products' },
+      { label: 'Create Product', icon: <AddCircleOutlineRoundedIcon fontSize="small" />, path: '/products/new', roles: CAN.createProduct },
     ],
   },
   {
-    label: 'Accounts',
-    icon: <AccountBalanceIcon fontSize="small" />,
-    children: [
-      { label: 'All Accounts', icon: <AccountBalanceIcon fontSize="small" />, path: '/accounts' },
-      {
-        label: 'Open Account',
-        icon: <AddCardIcon fontSize="small" />,
-        path: '/accounts/new',
-        roles: CAN.submitAccount,
-      },
+    heading: 'Accounts',
+    items: [
+      { label: 'All Accounts', icon: <AccountBalanceRoundedIcon fontSize="small" />, path: '/accounts' },
+      { label: 'Open Account', icon: <AddCardRoundedIcon fontSize="small" />, path: '/accounts/new', roles: CAN.submitAccount },
     ],
   },
 ];
@@ -90,108 +71,97 @@ export function Sidebar({ mobileOpen, onMobileClose, isMobile }: SidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { hasRole } = useAuth();
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-    Clients: true,
-    Products: true,
-    Accounts: true,
-  });
 
-  const toggleSection = (label: string) =>
-    setOpenSections((prev) => ({ ...prev, [label]: !prev[label] }));
+  const isActive = (path: string) =>
+    path === '/' ? location.pathname === '/' : location.pathname === path;
+
+  const go = (path: string) => {
+    navigate(path);
+    if (isMobile) onMobileClose();
+  };
 
   const content = (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Brand header */}
       <Box
         sx={{
+          height: 72,
           px: 2.5,
-          py: 2,
-          display: { md: 'none' },
+          display: 'flex',
+          alignItems: 'center',
           borderBottom: '1px solid',
           borderColor: 'divider',
         }}
       >
-        <Typography variant="h6" color="primary.main" fontWeight={700}>
-          CoreBanking
-        </Typography>
+        <BrandLogo variant="full" size={34} />
       </Box>
 
-      <Box sx={{ overflow: 'auto', flexGrow: 1, py: 1.5, px: 1.5 }}>
-        <List disablePadding>
-          {NAV_ITEMS.map((item) => {
-            if (item.children) {
-              const visibleChildren = item.children.filter(
-                (c) => !c.roles || hasRole(...(c.roles as Role[])),
-              );
-              if (visibleChildren.length === 0) return null;
-
-              const isOpen = openSections[item.label] ?? true;
-              return (
-                <Box key={item.label}>
-                  <ListItemButton
-                    onClick={() => toggleSection(item.label)}
-                    sx={{ borderRadius: 1, mb: 0.25 }}
-                  >
-                    <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
-                    <ListItemText
-                      primary={item.label}
-                      primaryTypographyProps={{ fontWeight: 600, fontSize: '0.875rem' }}
-                    />
-                    {isOpen ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
-                  </ListItemButton>
-                  <Collapse in={isOpen}>
-                    <List disablePadding sx={{ pl: 1 }}>
-                      {visibleChildren.map((child) => (
-                        <ListItemButton
-                          key={child.path}
-                          selected={location.pathname === child.path}
-                          onClick={() => {
-                            navigate(child.path!);
-                            if (isMobile) onMobileClose();
-                          }}
-                          sx={{ borderRadius: 1, mb: 0.25, py: 0.75 }}
-                        >
-                          <ListItemIcon sx={{ minWidth: 32, color: 'text.secondary' }}>
-                            {child.icon}
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={child.label}
-                            primaryTypographyProps={{ fontSize: '0.85rem' }}
-                          />
-                        </ListItemButton>
-                      ))}
-                    </List>
-                  </Collapse>
-                  <Divider sx={{ my: 0.5 }} />
-                </Box>
-              );
-            }
-
-            return (
-              <ListItemButton
-                key={item.path}
-                selected={location.pathname === item.path}
-                onClick={() => {
-                  navigate(item.path!);
-                  if (isMobile) onMobileClose();
+      <Box sx={{ overflowY: 'auto', flexGrow: 1, py: 2, px: 1.75 }}>
+        {NAV_SECTIONS.map((section) => {
+          const visible = section.items.filter((i) => !i.roles || hasRole(...(i.roles as Role[])));
+          if (visible.length === 0) return null;
+          return (
+            <Box key={section.heading} sx={{ mb: 2.5 }}>
+              <Typography
+                sx={{
+                  px: 1.5,
+                  mb: 0.75,
+                  fontSize: '0.66rem',
+                  fontWeight: 700,
+                  letterSpacing: '0.09em',
+                  textTransform: 'uppercase',
+                  color: 'text.disabled',
                 }}
-                sx={{ borderRadius: 1, mb: 0.25 }}
               >
-                <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
-                <ListItemText
-                  primary={item.label}
-                  primaryTypographyProps={{ fontWeight: 500, fontSize: '0.875rem' }}
-                />
-              </ListItemButton>
-            );
-          })}
-        </List>
+                {section.heading}
+              </Typography>
+              <List disablePadding sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
+                {visible.map((item) => {
+                  const active = isActive(item.path);
+                  return (
+                    <ListItemButton
+                      key={item.path}
+                      selected={active}
+                      onClick={() => go(item.path)}
+                      sx={{
+                        py: 0.9,
+                        position: 'relative',
+                        '&.Mui-selected::before': {
+                          content: '""',
+                          position: 'absolute',
+                          left: 0,
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          width: 3,
+                          height: 20,
+                          borderRadius: 4,
+                          backgroundColor: 'primary.main',
+                        },
+                      }}
+                    >
+                      <ListItemIcon sx={{ minWidth: 34, color: active ? 'primary.main' : 'text.secondary' }}>
+                        {item.icon}
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={item.label}
+                        primaryTypographyProps={{
+                          fontSize: '0.875rem',
+                          fontWeight: active ? 700 : 500,
+                        }}
+                      />
+                    </ListItemButton>
+                  );
+                })}
+              </List>
+            </Box>
+          );
+        })}
       </Box>
 
-      {/* Version footer */}
+      {/* Footer */}
       <Box sx={{ p: 2, borderTop: '1px solid', borderColor: 'divider' }}>
         <Typography variant="caption" color="text.disabled">
-          CoreBanking Staff Portal v1.0
+          Staff Portal · v1.0
         </Typography>
       </Box>
     </Box>
@@ -204,7 +174,12 @@ export function Sidebar({ mobileOpen, onMobileClose, isMobile }: SidebarProps) {
         open={mobileOpen}
         onClose={onMobileClose}
         ModalProps={{ keepMounted: true }}
-        sx={{ '& .MuiDrawer-paper': { width: DRAWER_WIDTH } }}
+        sx={{
+          '& .MuiDrawer-paper': {
+            width: DRAWER_WIDTH,
+            backgroundColor: 'background.paper',
+          },
+        }}
       >
         {content}
       </Drawer>
@@ -217,7 +192,13 @@ export function Sidebar({ mobileOpen, onMobileClose, isMobile }: SidebarProps) {
       sx={{
         width: DRAWER_WIDTH,
         flexShrink: 0,
-        '& .MuiDrawer-paper': { width: DRAWER_WIDTH, boxSizing: 'border-box', top: 64 },
+        '& .MuiDrawer-paper': {
+          width: DRAWER_WIDTH,
+          boxSizing: 'border-box',
+          backgroundColor: 'background.paper',
+          borderRight: '1px solid',
+          borderColor: 'divider',
+        },
       }}
     >
       {content}

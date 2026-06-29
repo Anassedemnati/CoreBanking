@@ -6,10 +6,12 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useNavigate, useParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useClient, useActivateClient } from '../../api/clients.api';
+import { useAccounts } from '../../api/accounts.api';
 import { StatusChip } from '../../components/common/StatusChip';
 import { PageHeader } from '../../components/common/PageHeader';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { RoleGuard } from '../../components/common/RoleGuard';
+import { RelatedAccountsCard } from '../../components/common/RelatedAccountsCard';
 import { CAN } from '../../auth/roles';
 import { useState } from 'react';
 
@@ -26,8 +28,11 @@ export default function ClientDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: client, isLoading, isError } = useClient(id!);
+  const { data: accounts, isLoading: loadingAccounts } = useAccounts();
   const activateMutation = useActivateClient();
   const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const clientAccounts = (accounts ?? []).filter((a) => a.clientId === id);
 
   const handleActivate = () => {
     const today = format(new Date(), 'yyyy-MM-dd');
@@ -90,6 +95,15 @@ export default function ClientDetailPage() {
               )}
             </CardContent>
           </Card>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <RelatedAccountsCard
+            title="Savings Accounts"
+            accounts={clientAccounts}
+            isLoading={isLoading || loadingAccounts}
+            emptyText="This client has no savings accounts yet."
+          />
         </Grid>
       </Grid>
 

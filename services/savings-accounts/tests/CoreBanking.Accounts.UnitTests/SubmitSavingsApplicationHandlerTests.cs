@@ -16,7 +16,14 @@ public sealed class SubmitSavingsApplicationHandlerTests
     private static readonly DateOnly Today = new(2026, 6, 6);
 
     private static SubmitSavingsApplicationCommand ValidCommand() =>
-        new(ClientId, ProductId, "SA-0001", "USD", 2, 5.0m, Today);
+        new(ClientId, ProductId, "USD", 2, 5.0m, Today);
+
+    private static IAccountNumberGenerator NumberGenerator(string value = "000000001")
+    {
+        var gen = Substitute.For<IAccountNumberGenerator>();
+        gen.NextAsync(Arg.Any<CancellationToken>()).Returns(value);
+        return gen;
+    }
 
     private static IClientRefRepository ActiveClientRepo()
     {
@@ -49,7 +56,8 @@ public sealed class SubmitSavingsApplicationHandlerTests
             Substitute.For<ISavingsAccountRepository>(),
             Substitute.For<ISavingsAccountUnitOfWork>(),
             clientRepo,
-            ValidProductRepo());
+            ValidProductRepo(),
+            NumberGenerator());
 
         var act = async () => await handler.Handle(ValidCommand(), default);
 
@@ -68,12 +76,34 @@ public sealed class SubmitSavingsApplicationHandlerTests
             Substitute.For<ISavingsAccountRepository>(),
             Substitute.For<ISavingsAccountUnitOfWork>(),
             clientRepo,
-            ValidProductRepo());
+            ValidProductRepo(),
+            NumberGenerator());
 
         var act = async () => await handler.Handle(ValidCommand(), default);
 
         await act.Should().ThrowAsync<DomainException>()
             .WithMessage("*not found*");
+    }
+
+    [Fact]
+    public async Task Submit_handler_assigns_generated_account_number()
+    {
+        SavingsAccount? saved = null;
+        var repo = Substitute.For<ISavingsAccountRepository>();
+        repo.When(r => r.Add(Arg.Any<SavingsAccount>()))
+            .Do(ci => saved = ci.Arg<SavingsAccount>());
+
+        var handler = new SubmitSavingsApplicationHandler(
+            repo,
+            Substitute.For<ISavingsAccountUnitOfWork>(),
+            ActiveClientRepo(),
+            ValidProductRepo(),
+            NumberGenerator("000000042"));
+
+        await handler.Handle(ValidCommand(), default);
+
+        saved.Should().NotBeNull();
+        saved!.AccountNo.Should().Be("000000042");
     }
 
     [Fact]

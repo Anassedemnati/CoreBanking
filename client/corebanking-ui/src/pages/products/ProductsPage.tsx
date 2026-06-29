@@ -5,11 +5,13 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
+import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProducts } from '../../api/products.api';
 import { PageHeader } from '../../components/common/PageHeader';
 import { RoleGuard } from '../../components/common/RoleGuard';
+import { EmptyState } from '../../components/common/EmptyState';
 import { CAN } from '../../auth/roles';
 
 export default function ProductsPage() {
@@ -105,8 +107,16 @@ export default function ProductsPage() {
                   ))}
               {!isLoading && filtered?.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
-                    <Typography color="text.secondary">No products found.</Typography>
+                  <TableCell colSpan={6} sx={{ borderBottom: 'none' }}>
+                    <EmptyState
+                      icon={<CategoryRoundedIcon />}
+                      title={search ? 'No matching products' : 'No products yet'}
+                      description={
+                        search
+                          ? 'Try a different product name.'
+                          : 'Created savings products will appear here.'
+                      }
+                    />
                   </TableCell>
                 </TableRow>
               )}

@@ -19,4 +19,17 @@ public sealed class ClientReadRepository(ClientsReadDbContext db) : IClientReadR
             .FirstOrDefaultAsync(ct);
         return client;
     }
+
+    public async Task<IReadOnlyList<ClientDto>> ListAsync(CancellationToken ct = default)
+    {
+        return await db.Clients
+            .OrderBy(c => c.DisplayName)
+            .Select(c => new ClientDto(
+                c.Id,
+                c.DisplayName,
+                c.ExternalId,
+                c.Status.ToString(),
+                c.ActivationDate))
+            .ToListAsync(ct);
+    }
 }

@@ -1,22 +1,29 @@
 import {
   Box, Card, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Typography, Button, Skeleton, Alert,
-  TextField, InputAdornment,
+  TextField, InputAdornment, Link,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
+import AccountBalanceRoundedIcon from '@mui/icons-material/AccountBalanceRounded';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAccounts } from '../../api/accounts.api';
+import { useClients } from '../../api/clients.api';
 import { StatusChip } from '../../components/common/StatusChip';
 import { PageHeader } from '../../components/common/PageHeader';
 import { RoleGuard } from '../../components/common/RoleGuard';
+import { EmptyState } from '../../components/common/EmptyState';
 import { CAN } from '../../auth/roles';
+import { tabularNums } from '../../theme/theme';
 
 export default function AccountsPage() {
   const navigate = useNavigate();
   const { data: accounts, isLoading, isError } = useAccounts();
+  const { data: clients } = useClients();
   const [search, setSearch] = useState('');
+
+  const clientName = new Map((clients ?? []).map((c) => [c.id, c.displayName]));
 
   const filtered = accounts?.filter(
     (a) =>
@@ -66,6 +73,7 @@ export default function AccountsPage() {
             <TableHead>
               <TableRow>
                 <TableCell>Account No.</TableCell>
+                <TableCell>Client</TableCell>
                 <TableCell>Currency</TableCell>
                 <TableCell align="right">Balance</TableCell>
                 <TableCell align="right">Rate</TableCell>
@@ -78,7 +86,7 @@ export default function AccountsPage() {
               {isLoading
                 ? Array.from({ length: 6 }).map((_, i) => (
                     <TableRow key={i}>
-                      {Array.from({ length: 7 }).map((__, j) => (
+                      {Array.from({ length: 8 }).map((__, j) => (
                         <TableCell key={j}><Skeleton /></TableCell>
                       ))}
                     </TableRow>
@@ -88,9 +96,19 @@ export default function AccountsPage() {
                       <TableCell>
                         <Typography variant="body2" fontWeight={600}>{a.accountNo}</Typography>
                       </TableCell>
+                      <TableCell>
+                        <Link
+                          component="button"
+                          type="button"
+                          onClick={() => navigate(`/clients/${a.clientId}`)}
+                          sx={{ fontWeight: 500 }}
+                        >
+                          {clientName.get(a.clientId) ?? '—'}
+                        </Link>
+                      </TableCell>
                       <TableCell>{a.currencyCode}</TableCell>
                       <TableCell align="right">
-                        <Typography variant="body2" fontWeight={600}>
+                        <Typography variant="body2" fontWeight={700} sx={tabularNums}>
                           {a.accountBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </Typography>
                       </TableCell>
@@ -108,8 +126,16 @@ export default function AccountsPage() {
                   ))}
               {!isLoading && filtered?.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
-                    <Typography color="text.secondary">No accounts found.</Typography>
+                  <TableCell colSpan={8} sx={{ borderBottom: 'none' }}>
+                    <EmptyState
+                      icon={<AccountBalanceRoundedIcon />}
+                      title={search ? 'No matching accounts' : 'No accounts yet'}
+                      description={
+                        search
+                          ? 'Try a different account number or status.'
+                          : 'Opened savings accounts will appear here.'
+                      }
+                    />
                   </TableCell>
                 </TableRow>
               )}

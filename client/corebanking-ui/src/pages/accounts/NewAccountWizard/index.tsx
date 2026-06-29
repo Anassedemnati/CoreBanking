@@ -22,13 +22,12 @@ export default function NewAccountWizard() {
   const [activeStep, setActiveStep] = useState(0);
   const [selectedClient, setSelectedClient] = useState<ClientDto | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<SavingsProductDto | null>(null);
-  const [accountNo, setAccountNo] = useState('');
   const [submittedOn, setSubmittedOn] = useState(format(new Date(), 'yyyy-MM-dd'));
 
   const canNext =
     (activeStep === 0 && !!selectedClient) ||
     (activeStep === 1 && !!selectedProduct) ||
-    (activeStep === 2 && !!accountNo.trim());
+    (activeStep === 2 && !!submittedOn);
 
   const handleNext = () => {
     if (activeStep < STEPS.length - 1) {
@@ -44,7 +43,6 @@ export default function NewAccountWizard() {
       {
         clientId: selectedClient.id,
         productId: selectedProduct.id,
-        accountNo: accountNo.trim(),
         currencyCode: selectedProduct.currencyCode,
         currencyDecimalPlaces: selectedProduct.currencyDecimalPlaces,
         nominalAnnualRate: selectedProduct.nominalAnnualRate,
@@ -97,9 +95,7 @@ export default function NewAccountWizard() {
             <Step3Review
               client={selectedClient}
               product={selectedProduct}
-              accountNo={accountNo}
               submittedOn={submittedOn}
-              onAccountNoChange={setAccountNo}
               onDateChange={setSubmittedOn}
               apiError={apiError}
             />

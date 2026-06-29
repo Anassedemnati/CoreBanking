@@ -21,33 +21,38 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+function buildUser(): AuthUser | null {
+  const tokenParsed = keycloak.tokenParsed as Record<string, unknown> | undefined;
+  if (!keycloak.authenticated || !tokenParsed) return null;
+  const realmRoles = (
+    (tokenParsed['realm_access'] as { roles?: string[] } | undefined)?.roles ?? []
+  ) as Role[];
+  return {
+    id: keycloak.subject ?? '',
+    username: (tokenParsed['preferred_username'] as string) ?? '',
+    fullName: (tokenParsed['name'] as string) ?? (tokenParsed['preferred_username'] as string) ?? '',
+    email: (tokenParsed['email'] as string) ?? '',
+    roles: realmRoles,
+    primaryRole: realmRoles[0] ?? null,
+  };
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Initialize synchronously from Keycloak so the first render is already authenticated.
+  // (Keycloak.init() completed before React mounted, so keycloak.authenticated is already true.)
+  const [user, setUser] = useState<AuthUser | null>(() => buildUser());
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => keycloak.authenticated ?? false);
 
   useEffect(() => {
-    const tokenParsed = keycloak.tokenParsed as Record<string, unknown> | undefined;
-    if (keycloak.authenticated && tokenParsed) {
-      const realmRoles = (
-        (tokenParsed['realm_access'] as { roles?: string[] } | undefined)?.roles ?? []
-      ) as Role[];
-
-      const firstRole = realmRoles[0] ?? null;
-
-      setUser({
-        id: keycloak.subject ?? '',
-        username: (tokenParsed['preferred_username'] as string) ?? '',
-        fullName: (tokenParsed['name'] as string) ?? (tokenParsed['preferred_username'] as string) ?? '',
-        email: (tokenParsed['email'] as string) ?? '',
-        roles: realmRoles,
-        primaryRole: firstRole,
-      });
-      setIsAuthenticated(true);
-    }
+    // Re-sync in case token was refreshed after mount
+    setUser(buildUser());
+    setIsAuthenticated(keycloak.authenticated ?? false);
 
     // Refresh token silently before expiry
     const refreshInterval = setInterval(() => {
-      keycloak.updateToken(60).catch(() => keycloak.logout());
+      keycloak.updateToken(60)
+        .then((refreshed) => { if (refreshed) { setUser(buildUser()); } })
+        .catch(() => keycloak.logout());
     }, 30_000);
 
     return () => clearInterval(refreshInterval);

@@ -45,9 +45,14 @@ public static class DependencyInjection
         services.AddScoped<IClientRefRepository, ClientRefRepository>();
         services.AddScoped<IProductRefRepository, ProductRefRepository>();
         services.AddScoped<IInboxService, InboxService>();
+        services.AddScoped<IAccountNumberGenerator, AccountNumberGenerator>();
 
         services.AddOptions<KafkaOptions>()
             .Bind(configuration.GetSection("Kafka"));
+
+        // Outbox → Kafka publishing for this service's own events (savings-accounts.events).
+        services.AddSingleton<IEventBus, KafkaEventBus>();
+        services.AddHostedService<OutboxProcessor<SavingsAccountsWriteDbContext>>();
 
         services.AddHostedService<ClientsConsumer>();
         services.AddHostedService<ProductsConsumer>();

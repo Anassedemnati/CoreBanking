@@ -104,6 +104,25 @@ public sealed class ClientsController(IMediator mediator) : ControllerBase
         var dto = await mediator.Send(new GetClientByIdQuery(id), ct);
         return Ok(dto);
     }
+
+    /// <summary>
+    /// List all clients.
+    /// </summary>
+    /// <remarks>
+    /// Returns every client, ordered by display name.
+    ///
+    /// Corresponds to Fineract <c>GET /v1/clients</c>.
+    /// </remarks>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>List of client data transfer objects.</returns>
+    /// <response code="200">List returned (may be empty).</response>
+    [HttpGet]
+    [ProducesResponseType(typeof(IReadOnlyList<ClientDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> List(CancellationToken ct)
+    {
+        var dtos = await mediator.Send(new ListClientsQuery(), ct);
+        return Ok(dtos);
+    }
 }
 
 /// <summary>Request body for the activate-client operation.</summary>

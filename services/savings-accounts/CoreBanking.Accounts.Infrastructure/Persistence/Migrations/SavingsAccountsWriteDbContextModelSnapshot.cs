@@ -23,6 +23,8 @@ namespace CoreBanking.Accounts.Infrastructure.Persistence.Migrations
 
             OracleModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.HasSequence("SAVINGS_ACCOUNT_NO_SEQ", "SAVINGS");
+
             modelBuilder.Entity("CoreBanking.Accounts.Application.ReadModels.ClientRef", b =>
                 {
                     b.Property<Guid>("ClientId")

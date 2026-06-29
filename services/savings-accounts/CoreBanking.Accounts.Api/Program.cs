@@ -1,5 +1,6 @@
 using CoreBanking.Accounts.Application.Accounts;
 using CoreBanking.Accounts.Infrastructure;
+using CoreBanking.Accounts.Infrastructure.Persistence;
 using CoreBanking.BuildingBlocks.Application;
 using CoreBanking.BuildingBlocks.Infrastructure;
 using CoreBanking.BuildingBlocks.Infrastructure.Security;
@@ -7,6 +8,7 @@ using FluentValidation;
 using Mediator;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +57,15 @@ builder.Services.AddOpenApi(options =>
 });
 
 var app = builder.Build();
+
+// Apply this service's EF migrations on startup so it owns and provisions its
+// schema (idempotent). Gate off with Database:MigrateOnStartup=false if needed.
+if (app.Configuration.GetValue("Database:MigrateOnStartup", true))
+{
+    using var scope = app.Services.CreateScope();
+    await scope.ServiceProvider.GetRequiredService<SavingsAccountsWriteDbContext>()
+        .Database.MigrateAsync();
+}
 
 app.UseExceptionHandler();
 app.UseAuthentication();

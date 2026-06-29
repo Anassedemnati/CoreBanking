@@ -2,6 +2,7 @@ using CoreBanking.BuildingBlocks.Application;
 using CoreBanking.BuildingBlocks.Domain;
 using CoreBanking.BuildingBlocks.Infrastructure;
 using CoreBanking.BuildingBlocks.Messaging;
+using CoreBanking.BuildingBlocks.Messaging.Kafka;
 using CoreBanking.Products.Application;
 using CoreBanking.Products.Contracts;
 using CoreBanking.Products.Domain;
@@ -37,6 +38,11 @@ public static class DependencyInjection
         services.AddScoped<ISavingsProductRepository, SavingsProductRepository>();
         services.AddScoped<ISavingsProductReadRepository, SavingsProductReadRepository>();
         services.AddScoped<IProductUnitOfWork, ProductUnitOfWork>();
+
+        // Outbox → Kafka publishing: drain OUTBOX_MESSAGES to products.events.
+        services.AddOptions<KafkaOptions>().Bind(configuration.GetSection("Kafka"));
+        services.AddSingleton<IEventBus, KafkaEventBus>();
+        services.AddHostedService<OutboxProcessor<SavingsProductsWriteDbContext>>();
 
         return services;
     }

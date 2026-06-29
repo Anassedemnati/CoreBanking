@@ -10,25 +10,25 @@ export function AppShell() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
-      <TopBar onMenuToggle={() => setMobileOpen((v) => !v)} />
+    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <Sidebar
         mobileOpen={mobileOpen}
         onMobileClose={() => setMobileOpen(false)}
         isMobile={isMobile}
       />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          width: { md: `calc(100% - ${DRAWER_WIDTH}px)` },
-          ml: { md: `${DRAWER_WIDTH}px` },
-          mt: '64px',
-          maxWidth: '100%',
-        }}
-      >
-        <Outlet />
+      <Box sx={{ flexGrow: 1, width: { md: `calc(100% - ${DRAWER_WIDTH}px)` } }}>
+        <TopBar onMenuToggle={() => setMobileOpen((v) => !v)} />
+        <Box
+          component="main"
+          sx={{
+            p: { xs: 2, sm: 3, md: 4 },
+            mt: { xs: '64px', md: '72px' },
+            maxWidth: 1400,
+            mx: 'auto',
+          }}
+        >
+          <Outlet />
+        </Box>
       </Box>
     </Box>
   );

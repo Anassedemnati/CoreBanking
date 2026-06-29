@@ -1,7 +1,7 @@
 import {
   Box, Card, CardContent, Grid, Typography, Button, Divider,
   Alert, Skeleton, TextField, Dialog, DialogTitle,
-  DialogContent, DialogActions, CircularProgress,
+  DialogContent, DialogActions, CircularProgress, Link,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CheckIcon from '@mui/icons-material/Check';
@@ -14,12 +14,15 @@ import { useState } from 'react';
 import { format } from 'date-fns';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAccount, useAccountTransactions, useApproveAccount, useActivateAccount, useRejectAccount, useWithdrawAccount, useCloseAccount, usePostInterest, useDeposit, useWithdrawMoney } from '../../api/accounts.api';
+import { useClient } from '../../api/clients.api';
+import { useProduct } from '../../api/products.api';
 import { StatusChip } from '../../components/common/StatusChip';
 import { PageHeader } from '../../components/common/PageHeader';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { RoleGuard } from '../../components/common/RoleGuard';
 import { CAN } from '../../auth/roles';
 import { TRANSACTION_TYPE_LABELS } from '../../api/types';
+import { tabularNums } from '../../theme/theme';
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -98,6 +101,8 @@ export default function AccountDetailPage() {
   const navigate = useNavigate();
   const { data: account, isLoading, isError } = useAccount(id!);
   const { data: transactions } = useAccountTransactions(id!);
+  const { data: client } = useClient(account?.clientId ?? '');
+  const { data: product } = useProduct(account?.productId ?? '');
 
   const approveMutation = useApproveAccount();
   const activateMutation = useActivateAccount();
@@ -185,6 +190,58 @@ export default function AccountDetailPage() {
 
       {isError && <Alert severity="error" sx={{ mb: 2 }}>Failed to load account.</Alert>}
 
+      {/* Balance hero */}
+      {account && (
+        <Card
+          sx={{
+            mb: 3,
+            color: 'common.white',
+            border: 'none',
+            background: (t) =>
+              `linear-gradient(120deg, ${t.palette.primary.dark} 0%, ${t.palette.primary.main} 60%, ${t.palette.secondary.main} 130%)`,
+          }}
+        >
+          <CardContent sx={{ p: { xs: 2.5, md: 3.5 } }}>
+            <Typography sx={{ opacity: 0.8, fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+              Current Balance
+            </Typography>
+            <Typography
+              sx={{
+                fontFamily: '"Plus Jakarta Sans", sans-serif',
+                fontWeight: 800,
+                fontSize: { xs: '2.2rem', md: '2.8rem' },
+                lineHeight: 1.1,
+                mt: 0.5,
+                ...tabularNums,
+              }}
+            >
+              {account.currencyCode}{' '}
+              {account.accountBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            </Typography>
+            <Box display="flex" flexWrap="wrap" gap={3} mt={2.5} sx={{ opacity: 0.92 }}>
+              <Box>
+                <Typography sx={{ fontSize: '0.72rem', opacity: 0.75, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Interest Rate
+                </Typography>
+                <Typography fontWeight={700}>{account.nominalAnnualRate}% p.a.</Typography>
+              </Box>
+              <Box>
+                <Typography sx={{ fontSize: '0.72rem', opacity: 0.75, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Status
+                </Typography>
+                <Typography fontWeight={700}>{account.status}</Typography>
+              </Box>
+              <Box>
+                <Typography sx={{ fontSize: '0.72rem', opacity: 0.75, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Interest Posted Till
+                </Typography>
+                <Typography fontWeight={700}>{account.interestPostedTillDate ?? '—'}</Typography>
+              </Box>
+            </Box>
+          </CardContent>
+        </Card>
+      )}
+
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>
           <Card>
@@ -195,6 +252,36 @@ export default function AccountDetailPage() {
               ) : (
                 <>
                   <InfoRow label="Account No." value={account?.accountNo} />
+                  <InfoRow
+                    label="Client"
+                    value={
+                      account ? (
+                        <Link
+                          component="button"
+                          type="button"
+                          onClick={() => navigate(`/clients/${account.clientId}`)}
+                          sx={{ fontWeight: 600 }}
+                        >
+                          {client?.displayName ?? 'View client'}
+                        </Link>
+                      ) : null
+                    }
+                  />
+                  <InfoRow
+                    label="Product"
+                    value={
+                      account ? (
+                        <Link
+                          component="button"
+                          type="button"
+                          onClick={() => navigate(`/products/${account.productId}`)}
+                          sx={{ fontWeight: 600 }}
+                        >
+                          {product?.name ?? 'View product'}
+                        </Link>
+                      ) : null
+                    }
+                  />
                   <InfoRow label="Status" value={account ? <StatusChip status={account.status} /> : null} />
                   <InfoRow label="Currency" value={account?.currencyCode} />
                   <InfoRow label="Interest Rate" value={`${account?.nominalAnnualRate}% p.a.`} />

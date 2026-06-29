@@ -352,6 +352,25 @@ public sealed class SavingsAccountsController(IMediator mediator) : ControllerBa
         var dto = await mediator.Send(new GetSavingsAccountByIdQuery(id), ct);
         return Ok(dto);
     }
+
+    /// <summary>
+    /// List all savings accounts.
+    /// </summary>
+    /// <remarks>
+    /// Returns every savings account, most recently submitted first.
+    ///
+    /// Corresponds to Fineract <c>GET /v1/savingsaccounts</c>.
+    /// </remarks>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>List of savings account data transfer objects.</returns>
+    /// <response code="200">List returned (may be empty).</response>
+    [HttpGet]
+    [ProducesResponseType(typeof(IReadOnlyList<SavingsAccountDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> List(CancellationToken ct)
+    {
+        var dtos = await mediator.Send(new ListSavingsAccountsQuery(), ct);
+        return Ok(dtos);
+    }
 }
 
 /// <summary>Request body for the approve-account operation.</summary>

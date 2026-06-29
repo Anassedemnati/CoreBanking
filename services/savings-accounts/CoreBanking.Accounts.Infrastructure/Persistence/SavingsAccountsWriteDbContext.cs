@@ -19,6 +19,14 @@ public sealed class SavingsAccountsWriteDbContext(DbContextOptions<SavingsAccoun
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("SAVINGS");
+
+        // Concurrency-safe source for generated account numbers. An Oracle sequence
+        // guarantees a distinct value per NEXTVAL across sessions and service
+        // instances without locking, so parallel submissions never collide.
+        modelBuilder.HasSequence<long>("SAVINGS_ACCOUNT_NO_SEQ", "SAVINGS")
+            .StartsAt(1)
+            .IncrementsBy(1);
+
         modelBuilder.ApplyConfiguration(new SavingsAccountConfiguration());
         modelBuilder.ApplyConfiguration(new SavingsAccountTransactionConfiguration());
         modelBuilder.ApplyConfiguration(new ClientRefConfiguration());

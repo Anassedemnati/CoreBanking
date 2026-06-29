@@ -81,10 +81,11 @@ flowchart TB
 | `POST /api/v1/clients` | Clients | Register client |
 | `POST /api/v1/clients/{id}/activate` | Clients | Activate client |
 | `GET  /api/v1/clients/{id}` | Clients | Get by id |
+| `GET  /api/v1/clients` | Clients | List |
 | `POST /api/v1/savingsproducts` | Products | Create product |
 | `GET  /api/v1/savingsproducts/{id}` | Products | Get by id |
 | `GET  /api/v1/savingsproducts` | Products | List |
-| `POST /api/v1/savingsaccounts` | Accounts | Submit application (201) |
+| `POST /api/v1/savingsaccounts` | Accounts | Submit application (201) — account number is generated server-side (no `accountNo` in the request body) |
 | `POST /api/v1/savingsaccounts/{id}/approve` | Accounts | Approve |
 | `POST /api/v1/savingsaccounts/{id}/activate` | Accounts | Activate |
 | `POST /api/v1/savingsaccounts/{id}/reject` | Accounts | Reject |
@@ -95,8 +96,13 @@ flowchart TB
 | `POST /api/v1/savingsaccounts/{id}/postinterest` | Accounts | Post interest (idempotent) |
 | `GET  /api/v1/savingsaccounts/{id}/transactions` | Accounts | List transactions |
 | `GET  /api/v1/savingsaccounts/{id}` | Accounts | Get by id |
+| `GET  /api/v1/savingsaccounts` | Accounts | List |
 
-The gateway forwards `/api/v1/<segment>/{**catch-all}` to the matching cluster (`clients-cluster`→5101, `products-cluster`→5102, `accounts-cluster`→5103) defined in `gateway/CoreBanking.Gateway/appsettings.json`.
+The gateway forwards `/api/v1/<segment>/{**catch-all}` to the matching cluster (`clients-cluster`→5101, `products-cluster`→5102, `accounts-cluster`→5103) defined in `gateway/CoreBanking.Gateway/appsettings.json`. The gateway also applies a CORS policy (`ui`, origins from `Cors:AllowedOrigins`, default `http://localhost:5173`) to all routes so the browser SPA can call the API. Each service applies its EF migrations on startup (`Database:MigrateOnStartup`, default true).
+
+**Outbox publishing:** each service registers `OutboxProcessor<TWriteDbContext>` (a hosted service) plus the Kafka `IEventBus`, which drains `OUTBOX_MESSAGES` to the service's `*.events` topic. Without this, domain events are written to the outbox but never published (the Accounts read-model replicas `CLIENT_REF`/`PRODUCT_REF` stay empty and account submission fails validation).
+
+**Account numbers** are generated server-side from the Oracle sequence `SAVINGS.SAVINGS_ACCOUNT_NO_SEQ` (`IAccountNumberGenerator`), zero-padded. `NEXTVAL` is atomic across sessions/instances, so concurrent submissions never collide; the unique index on `ACCOUNTNO` is a backstop.
 
 ---
 

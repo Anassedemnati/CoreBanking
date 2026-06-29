@@ -4,7 +4,9 @@ import {
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useProduct } from '../../api/products.api';
+import { useAccounts } from '../../api/accounts.api';
 import { PageHeader } from '../../components/common/PageHeader';
+import { RelatedAccountsCard } from '../../components/common/RelatedAccountsCard';
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -19,6 +21,9 @@ export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: product, isLoading, isError } = useProduct(id!);
+  const { data: accounts, isLoading: loadingAccounts } = useAccounts();
+
+  const productAccounts = (accounts ?? []).filter((a) => a.productId === id);
 
   return (
     <Box>
@@ -55,6 +60,15 @@ export default function ProductDetailPage() {
               )}
             </CardContent>
           </Card>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <RelatedAccountsCard
+            title="Accounts on this Product"
+            accounts={productAccounts}
+            isLoading={isLoading || loadingAccounts}
+            emptyText="No savings accounts use this product yet."
+          />
         </Grid>
       </Grid>
     </Box>

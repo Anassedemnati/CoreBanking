@@ -9,7 +9,6 @@ namespace CoreBanking.Accounts.Application.Accounts;
 public sealed record SubmitSavingsApplicationCommand(
     Guid ClientId,
     Guid ProductId,
-    string AccountNo,
     string CurrencyCode,
     int CurrencyDecimalPlaces,
     decimal NominalAnnualRate,
@@ -24,7 +23,6 @@ public sealed class SubmitSavingsApplicationValidator : AbstractValidator<Submit
     {
         RuleFor(x => x.ClientId).NotEmpty();
         RuleFor(x => x.ProductId).NotEmpty();
-        RuleFor(x => x.AccountNo).NotEmpty().MaximumLength(50);
         RuleFor(x => x.CurrencyCode).Length(3);
         RuleFor(x => x.NominalAnnualRate).GreaterThanOrEqualTo(0);
         RuleFor(x => x.Compounding).IsInEnum();
@@ -37,7 +35,8 @@ public sealed class SubmitSavingsApplicationHandler(
     ISavingsAccountRepository repo,
     ISavingsAccountUnitOfWork uow,
     IClientRefRepository clientRefRepo,
-    IProductRefRepository productRefRepo)
+    IProductRefRepository productRefRepo,
+    IAccountNumberGenerator accountNumberGenerator)
     : ICommandHandler<SubmitSavingsApplicationCommand, Guid>
 {
     public async ValueTask<Guid> Handle(SubmitSavingsApplicationCommand cmd, CancellationToken ct)
@@ -51,8 +50,12 @@ public sealed class SubmitSavingsApplicationHandler(
         _ = await productRefRepo.FindAsync(cmd.ProductId, ct)
             ?? throw new DomainException("account.product.notfound", $"Product {cmd.ProductId} not found.");
 
+        // Account number is generated server-side from a concurrency-safe sequence,
+        // never supplied by the caller.
+        var accountNo = await accountNumberGenerator.NextAsync(ct);
+
         var account = SavingsAccount.SubmitApplication(
-            cmd.ClientId, cmd.ProductId, cmd.AccountNo,
+            cmd.ClientId, cmd.ProductId, accountNo,
             cmd.CurrencyCode, cmd.CurrencyDecimalPlaces,
             cmd.NominalAnnualRate, cmd.SubmittedOn,
             cmd.Compounding, cmd.PostingPeriod, cmd.DaysInYear);

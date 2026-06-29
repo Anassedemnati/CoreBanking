@@ -5,12 +5,14 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
+import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useClients } from '../../api/clients.api';
 import { StatusChip } from '../../components/common/StatusChip';
 import { PageHeader } from '../../components/common/PageHeader';
 import { RoleGuard } from '../../components/common/RoleGuard';
+import { EmptyState } from '../../components/common/EmptyState';
 import { CAN } from '../../auth/roles';
 
 export default function ClientsPage() {
@@ -97,8 +99,16 @@ export default function ClientsPage() {
                   ))}
               {!isLoading && filtered?.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
-                    <Typography color="text.secondary">No clients found.</Typography>
+                  <TableCell colSpan={5} sx={{ borderBottom: 'none' }}>
+                    <EmptyState
+                      icon={<PeopleRoundedIcon />}
+                      title={search ? 'No matching clients' : 'No clients yet'}
+                      description={
+                        search
+                          ? 'Try a different name or external ID.'
+                          : 'Registered clients will appear here.'
+                      }
+                    />
                   </TableCell>
                 </TableRow>
               )}
