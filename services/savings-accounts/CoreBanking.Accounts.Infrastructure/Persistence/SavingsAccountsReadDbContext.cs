@@ -9,12 +9,14 @@ public sealed class SavingsAccountsReadDbContext(DbContextOptions<SavingsAccount
 {
     public DbSet<SavingsAccount> SavingsAccounts => Set<SavingsAccount>();
     public DbSet<SavingsAccountTransaction> SavingsTransactions => Set<SavingsAccountTransaction>();
+    public DbSet<AccountTransfer> AccountTransfers => Set<AccountTransfer>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("SAVINGS");
         modelBuilder.ApplyConfiguration(new SavingsAccountConfiguration());
         modelBuilder.ApplyConfiguration(new SavingsAccountTransactionConfiguration());
+        modelBuilder.ApplyConfiguration(new AccountTransferConfiguration());
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)

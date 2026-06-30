@@ -7,4 +7,5 @@ public interface ISavingsAccountReadRepository
     Task<SavingsAccountDto?> FindDtoAsync(Guid id, CancellationToken ct = default);
     Task<IReadOnlyList<SavingsAccountDto>> ListAsync(CancellationToken ct = default);
     Task<IReadOnlyList<SavingsTransactionDto>> FindTransactionsAsync(Guid accountId, CancellationToken ct = default);
+    Task<AccountTransferDto?> GetAccountTransferAsync(Guid transferId, CancellationToken ct = default);
 }

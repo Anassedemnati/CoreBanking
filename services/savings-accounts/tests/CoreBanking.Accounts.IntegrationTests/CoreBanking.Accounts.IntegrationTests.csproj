@@ -4,11 +4,19 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <!-- SQLite's native lib (SQLitePCLRaw.lib.e_sqlite3 2.1.11) has a known high-severity
+       advisory (GHSA-2m69-gcr7-jv3q). No fix version exists yet on NuGet; suppress
+       the audit error for this test-only project so the build does not break. -->
+  <ItemGroup>
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-2m69-gcr7-jv3q" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="coverlet.collector" />
     <PackageReference Include="FluentAssertions" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="Testcontainers.Oracle" />
     <PackageReference Include="xunit" />

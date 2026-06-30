@@ -1,32 +1,16 @@
 using CoreBanking.Accounts.Domain;
-using CoreBanking.Accounts.Infrastructure.Persistence;
+using CoreBanking.Accounts.IntegrationTests.Infrastructure;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Testcontainers.Oracle;
 
 namespace CoreBanking.Accounts.IntegrationTests;
 
 public sealed class SavingsAccountClosePersistenceTests : IAsyncLifetime
 {
-    // Mirrors SavingsTransactionsPersistenceTests: same image as docker-compose's oracle-free
-    // service, connecting as the SAVINGS user so the DbContext's HasDefaultSchema("SAVINGS")
-    // resolves to the connecting user's own schema. See that test for the full rationale.
-    private const string OraPassword = "TestPassword1";
-    private readonly OracleContainer _oracle = new OracleBuilder()
-        .WithImage("gvenzl/oracle-free:latest")
-        .WithUsername("SAVINGS")
-        .WithPassword(OraPassword)
-        .Build();
+    private readonly SavingsTestDatabase _db = new();
 
-    public Task InitializeAsync() => _oracle.StartAsync();
-    public Task DisposeAsync() => _oracle.DisposeAsync().AsTask();
-
-    private DbContextOptions<SavingsAccountsWriteDbContext> Options =>
-        new DbContextOptionsBuilder<SavingsAccountsWriteDbContext>()
-            // Testcontainers.Oracle 3.10 hard-codes SERVICE_NAME=XEPDB1; gvenzl/oracle-free's
-            // PDB is FREEPDB1, so patch the service name before handing the string to EF.
-            .UseOracle(_oracle.GetConnectionString().Replace("XEPDB1", "FREEPDB1"))
-            .Options;
+    public Task InitializeAsync() => _db.InitializeAsync();
+    public Task DisposeAsync() => _db.DisposeAsync();
 
     [Fact]
     public async Task Close_with_sweep_persists_closed_status_and_closedon()
@@ -35,24 +19,21 @@ public sealed class SavingsAccountClosePersistenceTests : IAsyncLifetime
         var closedOn = new DateOnly(2026, 3, 15);
         Guid accountId;
 
-        await using (var ctx = new SavingsAccountsWriteDbContext(Options))
+        await using (var ctx = _db.NewDbContext())
         {
-            await ctx.Database.MigrateAsync();
-
             var account = SavingsAccount.SubmitApplication(
                 Guid.NewGuid(), Guid.NewGuid(), "SA-CLOSE-IT", "USD", 2, 5.0m, new DateOnly(2026, 1, 1));
             account.Approve(new DateOnly(2026, 1, 1));
             account.Activate(new DateOnly(2026, 1, 1));
             account.Deposit(new DateOnly(2026, 1, 10), 1000m, today);
             account.Close(closedOn, withdrawBalance: true, today);
-            account.ClearDomainEvents(); // outbox interceptor is not wired in this raw context
             accountId = account.Id;
 
             ctx.SavingsAccounts.Add(account);
             await ctx.SaveChangesAsync();
         }
 
-        await using (var ctx = new SavingsAccountsWriteDbContext(Options))
+        await using (var ctx = _db.NewDbContext())
         {
             var loaded = await ctx.SavingsAccounts
                 .Include(a => a.Transactions)

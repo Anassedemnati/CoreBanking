@@ -34,6 +34,7 @@ public static class DependencyInjection
             o.UseOracle(primary)
              .AddInterceptors(
                  sp.GetRequiredService<AuditableEntityInterceptor>(),
+                 new AggregateVersionInterceptor(),
                  new ConvertDomainEventsToOutboxInterceptor(DomainEventToIntegrationEventMap)));
 
         services.AddDbContext<SavingsAccountsReadDbContext>((sp, o) =>
@@ -42,6 +43,7 @@ public static class DependencyInjection
         services.AddScoped<ISavingsAccountRepository, SavingsAccountRepository>();
         services.AddScoped<ISavingsAccountReadRepository, SavingsAccountReadRepository>();
         services.AddScoped<ISavingsAccountUnitOfWork, SavingsAccountUnitOfWork>();
+        services.AddScoped<IAccountTransferRepository, AccountTransferRepository>();
         services.AddScoped<IClientRefRepository, ClientRefRepository>();
         services.AddScoped<IProductRefRepository, ProductRefRepository>();
         services.AddScoped<IInboxService, InboxService>();
@@ -60,7 +62,7 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IntegrationEvent? DomainEventToIntegrationEventMap(IDomainEvent domainEvent)
+    internal static IntegrationEvent? DomainEventToIntegrationEventMap(IDomainEvent domainEvent)
         => domainEvent switch
         {
             SavingsAccountSubmitted e => new SavingsAccountSubmittedIntegrationEvent(
@@ -90,6 +92,17 @@ public static class DependencyInjection
             SavingsAccountClosed e => new SavingsAccountClosedIntegrationEvent(
                 Guid.CreateVersion7(), DateTimeOffset.UtcNow, 1,
                 e.AccountId, e.ClosedOn, e.BalanceAfter),
+            MoneyTransferred e => new MoneyTransferredIntegrationEvent(
+                Guid.CreateVersion7(), DateTimeOffset.UtcNow, 1,
+                e.TransferId,
+                e.SourceAccountId,
+                e.DestinationAccountId,
+                e.SourceTransactionId,
+                e.DestinationTransactionId,
+                e.Amount,
+                e.CurrencyCode,
+                e.TransferDate,
+                e.ClientTransferReference),
             _ => null
         };
 }

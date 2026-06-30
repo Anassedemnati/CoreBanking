@@ -69,7 +69,7 @@ flowchart TB
 |---|---|---|---|---|---|
 | **Clients** | `CoreBanking.Clients` | `:5101` `/api/v1/clients` | `CLIENTS` | `ClientRegistered`, `ClientActivated` → `clients.events` | — |
 | **Savings Products** | `CoreBanking.Products` | `:5102` `/api/v1/savingsproducts` | `PRODUCTS` | `SavingsProductCreated` → `products.events` | — |
-| **Savings Accounts** | `CoreBanking.Accounts` | `:5103` `/api/v1/savingsaccounts` | `SAVINGS` | `SavingsAccountSubmitted/Approved/Activated/Rejected/Withdrawn/Closed`, `SavingsDeposited`, `SavingsWithdrawn`, `SavingsInterestPosted` → `savings-accounts.events` | `clients.events`, `products.events` |
+| **Savings Accounts** | `CoreBanking.Accounts` | `:5103` `/api/v1/savingsaccounts` | `SAVINGS` | `SavingsAccountSubmitted/Approved/Activated/Rejected/Withdrawn/Closed`, `SavingsDeposited`, `SavingsWithdrawn`, `SavingsInterestPosted`, `MoneyTransferred` → `savings-accounts.events` | `clients.events`, `products.events` |
 | **Gateway** | `CoreBanking.Gateway` | `:5100` | — | — | — |
 
 > Directory ≠ namespace: `services/savings-accounts/` → `CoreBanking.Accounts.*`, `services/savings-products/` → `CoreBanking.Products.*`.
@@ -97,8 +97,10 @@ flowchart TB
 | `GET  /api/v1/savingsaccounts/{id}/transactions` | Accounts | List transactions |
 | `GET  /api/v1/savingsaccounts/{id}` | Accounts | Get by id |
 | `GET  /api/v1/savingsaccounts` | Accounts | List |
+| `POST /api/v1/accounttransfers` | Accounts | Transfer money savings→savings (201) — books a withdrawal + deposit + one link record in one transaction; `[Authorize]` + transfer policy |
+| `GET  /api/v1/accounttransfers/{id}` | Accounts | Get transfer by id |
 
-The gateway forwards `/api/v1/<segment>/{**catch-all}` to the matching cluster (`clients-cluster`→5101, `products-cluster`→5102, `accounts-cluster`→5103) defined in `gateway/CoreBanking.Gateway/appsettings.json`. The gateway also applies a CORS policy (`ui`, origins from `Cors:AllowedOrigins`, default `http://localhost:5173`) to all routes so the browser SPA can call the API. Each service applies its EF migrations on startup (`Database:MigrateOnStartup`, default true).
+The gateway forwards `/api/v1/<segment>/{**catch-all}` to the matching cluster (`clients-cluster`→5101, `products-cluster`→5102, `accounts-cluster`→5103) defined in `gateway/CoreBanking.Gateway/appsettings.json`. The Accounts service owns two path segments — `savingsaccounts` and `accounttransfers` — both routed to `accounts-cluster`. The gateway also applies a CORS policy (`ui`, origins from `Cors:AllowedOrigins`, default `http://localhost:5173`) to all routes so the browser SPA can call the API. Each service applies its EF migrations on startup (`Database:MigrateOnStartup`, default true).
 
 **Outbox publishing:** each service registers `OutboxProcessor<TWriteDbContext>` (a hosted service) plus the Kafka `IEventBus`, which drains `OUTBOX_MESSAGES` to the service's `*.events` topic. Without this, domain events are written to the outbox but never published (the Accounts read-model replicas `CLIENT_REF`/`PRODUCT_REF` stay empty and account submission fails validation).
 
@@ -203,6 +205,7 @@ sequenceDiagram
 Implementation notes (actual):
 - **Domain → integration event mapping** is a `switch` named `DomainEventToIntegrationEventMap` in each Infrastructure project's `DependencyInjection.cs`. **Adding a published event is a 3-part change:** raise the domain event (Domain `Events/`), declare the integration event (Clients/Products in their `*.Contracts` project; Accounts in `Infrastructure/Events/`), add a `case` to the map.
 - Each `IntegrationEvent` declares its own `Topic` and `AggregateKey` (the partition key — always the aggregate id, preserving per-entity ordering).
+- **Account transfers** add one correlation event: `MoneyTransferred` (raised by the `AccountTransfer` link aggregate) maps to `MoneyTransferredIntegrationEvent` (`Topic = savings-accounts.events`, `AggregateKey = TransferId`) via a `case` in the Accounts `DomainEventToIntegrationEventMap`. The two per-leg events `SavingsWithdrawn` (source) and `SavingsDeposited` (destination) **still fire unchanged** — they are real per-account ledger changes; `MoneyTransferred` ties both legs + the transfer id together. Keyed by `TransferId`, it lands on a different partition than the `AccountId`-keyed leg events (no co-partition ordering between a leg event and its correlation event).
 - The Accounts consumers are **custom `BackgroundService`s** (`Infrastructure/Consumers/ClientsConsumer`, `ProductsConsumer`), registered via `AddHostedService`. They read the `type` header, dedupe through `IInboxService` (`INBOX_MESSAGES`), and upsert `CLIENT_REF`/`PRODUCT_REF` guarded by `EventVersion` (older/out-of-order events ignored).
 - `clients.events` and `products.events` are **log-compacted** and keyed by entity id, so a wiped or brand-new read model re-materialises by replaying from offset 0 — no snapshot/republish needed. `savings-accounts.events` is a normal (non-compacted) event stream.
 - Kafka transport lives in `BuildingBlocks.Messaging/Kafka` (`KafkaEventBus : IEventBus`, `KafkaConsumerBackgroundService`, `KafkaOptions` bound from config section `Kafka`).
@@ -255,13 +258,17 @@ erDiagram
     CLIENT_REF ||--o{ SAVINGS_ACCOUNTS : "validated by (local replica)"
     PRODUCT_REF ||--o{ SAVINGS_ACCOUNTS : "templated by (local replica)"
     SAVINGS_ACCOUNTS ||--o{ SAVINGS_ACCOUNT_TRANSACTIONS : "has timeline"
+    ACCOUNT_TRANSFERS }o..o{ SAVINGS_ACCOUNTS : "by-id refs (source/destination, no FK)"
+    ACCOUNT_TRANSFERS }o..o{ SAVINGS_ACCOUNT_TRANSACTIONS : "by-id refs (withdrawal/deposit legs, no FK)"
 ```
+
+> `ACCOUNT_TRANSFERS` is a separate aggregate (`AccountTransfer`) — it references the two `SAVINGS_ACCOUNTS` and their two leg transactions **by id only, with no FK constraints** (the boundary is aggregate, not schema). Indexes (v1): unique on `CLIENTTRANSFERREFERENCE` (idempotency key), plus `SOURCETRANSACTIONID`/`DESTINATIONTRANSACTIONID` for the statement-enrichment join. The dashed ER lines above denote these by-id, non-enforced references.
 
 | Schema | Tables (actual) |
 |---|---|
 | `CLIENTS` | `CLIENTS`, `OUTBOX_MESSAGES` |
 | `PRODUCTS` | `SAVINGS_PRODUCTS`, `OUTBOX_MESSAGES` |
-| `SAVINGS` | `SAVINGS_ACCOUNTS`, `SAVINGS_ACCOUNT_TRANSACTIONS`, `CLIENT_REF`, `PRODUCT_REF`, `INBOX_MESSAGES`, `OUTBOX_MESSAGES` |
+| `SAVINGS` | `SAVINGS_ACCOUNTS`, `SAVINGS_ACCOUNT_TRANSACTIONS`, `ACCOUNT_TRANSFERS`, `CLIENT_REF`, `PRODUCT_REF`, `INBOX_MESSAGES`, `OUTBOX_MESSAGES` |
 
 - Each service has a **Write** DbContext (primary, owns migrations) and a **Read** DbContext (replica, `NoTracking`): `ClientsWriteDbContext`/`ClientsReadDbContext`, `SavingsProductsWriteDbContext`/`SavingsProductsReadDbContext`, `SavingsAccountsWriteDbContext`/`SavingsAccountsReadDbContext`. Connection strings: `ConnectionStrings:Primary` / `ConnectionStrings:Replica` (identical on the `free` profile).
 - Migrations live under each Infrastructure project's `Persistence/Migrations/`. See `CLAUDE.md` for the `dotnet ef migrations add` invocation.

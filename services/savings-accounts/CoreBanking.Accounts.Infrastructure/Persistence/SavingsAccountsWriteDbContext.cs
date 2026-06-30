@@ -12,6 +12,7 @@ public sealed class SavingsAccountsWriteDbContext(DbContextOptions<SavingsAccoun
 {
     public DbSet<SavingsAccount> SavingsAccounts => Set<SavingsAccount>();
     public DbSet<SavingsAccountTransaction> SavingsTransactions => Set<SavingsAccountTransaction>();
+    public DbSet<AccountTransfer> AccountTransfers => Set<AccountTransfer>();
     public DbSet<OutboxMessage> Outbox => Set<OutboxMessage>();
     public DbSet<ClientRef> ClientRefs => Set<ClientRef>();
     public DbSet<ProductRef> ProductRefs => Set<ProductRef>();
@@ -23,12 +24,18 @@ public sealed class SavingsAccountsWriteDbContext(DbContextOptions<SavingsAccoun
         // Concurrency-safe source for generated account numbers. An Oracle sequence
         // guarantees a distinct value per NEXTVAL across sessions and service
         // instances without locking, so parallel submissions never collide.
-        modelBuilder.HasSequence<long>("SAVINGS_ACCOUNT_NO_SEQ", "SAVINGS")
-            .StartsAt(1)
-            .IncrementsBy(1);
+        // Only declare the sequence for Oracle; SQLite has no sequence support
+        // and EnsureCreated would fail if we attempted to create one there.
+        if (Database.IsOracle())
+        {
+            modelBuilder.HasSequence<long>("SAVINGS_ACCOUNT_NO_SEQ", "SAVINGS")
+                .StartsAt(1)
+                .IncrementsBy(1);
+        }
 
         modelBuilder.ApplyConfiguration(new SavingsAccountConfiguration());
         modelBuilder.ApplyConfiguration(new SavingsAccountTransactionConfiguration());
+        modelBuilder.ApplyConfiguration(new AccountTransferConfiguration());
         modelBuilder.ApplyConfiguration(new ClientRefConfiguration());
         modelBuilder.ApplyConfiguration(new ProductRefConfiguration());
         modelBuilder.Entity<OutboxMessage>(e =>

@@ -1,3 +1,4 @@
+using CoreBanking.Accounts.Api.Security;
 using CoreBanking.Accounts.Application.Accounts;
 using CoreBanking.Accounts.Infrastructure;
 using CoreBanking.Accounts.Infrastructure.Persistence;
@@ -23,6 +24,13 @@ builder.Services.AddMediator(o =>
 builder.Services.AddValidatorsFromAssemblyContaining<SubmitSavingsApplicationValidator>(ServiceLifetime.Scoped);
 
 builder.Services.AddSavingsAccountsInfrastructure(builder.Configuration);
+
+// Override ICurrentUser with an HTTP-context-aware implementation so that
+// audit columns (CreatedBy / LastModifiedBy) record the real JWT subject
+// rather than the "system" fallback registered in Infrastructure DI.
+// MapInboundClaims = false (below) keeps the JWT "sub" claim name as-is.
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, HttpContextCurrentUser>();
 
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
